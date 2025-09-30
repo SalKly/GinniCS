@@ -1,21 +1,18 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "primereact/button";
 import { Card } from "primereact/card";
-import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { useRouter } from "next/router";
-import { searchCompanies, getCompaniesWithForms, deleteCompany, type CompanyWithForm } from "../../services/companies";
+import { getCompaniesWithForms, deleteCompany, type CompanyWithForm } from "../../services/companies";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 
 export function CompanyFormEntrance() {
   const router = useRouter();
   const toast = useRef<Toast>(null);
-  const [searchTerm, setSearchTerm] = useState("");
   const [companies, setCompanies] = useState<CompanyWithForm[]>([]);
   const [loading, setLoading] = useState(false);
-  const [showAllCompanies, setShowAllCompanies] = useState(false);
 
   // Load recent companies on component mount
   useEffect(() => {
@@ -26,51 +23,13 @@ export function CompanyFormEntrance() {
     try {
       setLoading(true);
       const companiesData = await getCompaniesWithForms();
-      setCompanies(companiesData.slice(0, 10)); // Show first 10 companies
+      setCompanies(companiesData);
     } catch (error: any) {
       console.error("Error loading companies:", error);
       toast.current?.show({
         severity: "error",
         summary: "Error",
         detail: "Failed to load companies",
-        life: 3000,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSearch = async () => {
-    if (!searchTerm.trim()) {
-      loadRecentCompanies();
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const searchResults = await searchCompanies(searchTerm);
-
-      // Get forms for each company
-      const companiesWithForms = await Promise.all(
-        searchResults.map(async (company) => {
-          try {
-            const { getCompanyForm } = await import("../../services/companies");
-            const form = await getCompanyForm(company.id);
-            return { ...company, form: form || undefined };
-          } catch (error) {
-            return { ...company, form: undefined };
-          }
-        })
-      );
-
-      setCompanies(companiesWithForms);
-      setShowAllCompanies(true);
-    } catch (error: any) {
-      console.error("Error searching companies:", error);
-      toast.current?.show({
-        severity: "error",
-        summary: "Search Error",
-        detail: "Failed to search companies",
         life: 3000,
       });
     } finally {
@@ -202,73 +161,33 @@ export function CompanyFormEntrance() {
       <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-8">
-          <img src="/GA_Logo_On-purple.png" alt="Ginni Logo" className="w-1/2 mx-auto" />
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Company Form Manager</h1>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Create new forms or manage existing company forms. Search for your company or create a new one to get started.
-          </p>
-        </div>
-
-        {/* Action Cards */}
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          {/* Create New Form Card */}
-          <Card className="border-2 border-dashed border-purple-300 hover:border-purple-400 transition-colors">
-            <div className="text-center p-6">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <i className="fas fa-plus text-purple-600 text-xl"></i>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Create New Form</h3>
-              <p className="text-gray-600 mb-4">Start fresh with a new company form and build your evaluation blueprint.</p>
-              <Button
-                label="Create New Form"
-                icon="fas fa-plus"
-                className="p-button-lg"
-                style={{ backgroundColor: "rgb(84, 22, 123)" }}
-                onClick={handleCreateNew}
-              />
+          <img src="/GA_Logo_On-purple.png" alt="Ginni Logo" className="w-1/2 mx-auto mb-6" />
+          <div className="flex items-center justify-center gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Company Form Manager</h1>
+              <p className="text-gray-600">Manage your company forms and evaluation blueprints</p>
             </div>
-          </Card>
-
-          {/* Search Existing Card */}
-          <Card>
-            <div className="p-6">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                <i className="fas fa-search text-purple-700 text-xl"></i>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Find Existing Company</h3>
-              <p className="text-gray-600 mb-4">Search for an existing company to edit its form or view the evaluation tree.</p>
-
-              <div className="flex gap-2">
-                <InputText
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Enter company name..."
-                  className="flex-1"
-                  onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-                />
-                <Button icon="fas fa-search" onClick={handleSearch} loading={loading} disabled={loading} />
-              </div>
-            </div>
-          </Card>
+            <Button
+              icon="fas fa-plus"
+              className="p-button-rounded p-button-lg"
+              style={{ backgroundColor: "rgb(84, 22, 123)" }}
+              onClick={handleCreateNew}
+              tooltip="Add New Company"
+              tooltipOptions={{ position: "left" }}
+            />
+          </div>
         </div>
 
         {/* Companies Table */}
-        {companies.length > 0 && (
+        {companies.length > 0 ? (
           <Card>
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-semibold text-gray-900">{showAllCompanies ? "Search Results" : "Recent Companies"}</h3>
-                {!showAllCompanies && (
-                  <Button
-                    label="View All Companies"
-                    icon="fas fa-list"
-                    className="p-button-text p-button-sm"
-                    onClick={() => {
-                      setShowAllCompanies(true);
-                      loadRecentCompanies();
-                    }}
-                  />
-                )}
+                <h3 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+                  <i className="fas fa-building text-purple-700"></i>
+                  Your Companies
+                  <span className="text-sm font-normal text-gray-500">({companies.length})</span>
+                </h3>
               </div>
 
               <DataTable
@@ -304,24 +223,27 @@ export function CompanyFormEntrance() {
               </DataTable>
             </div>
           </Card>
-        )}
-
-        {/* Empty State */}
-        {companies.length === 0 && !loading && showAllCompanies && (
-          <Card>
-            <div className="text-center p-12">
-              <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <i className="fas fa-building text-gray-400 text-2xl"></i>
+        ) : (
+          !loading && (
+            <Card>
+              <div className="text-center p-12">
+                <div className="w-20 h-20 bg-purple-50 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <i className="fas fa-building text-purple-700 text-3xl"></i>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">No companies yet</h3>
+                <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                  Get started by creating your first company form. Click the plus button above to begin.
+                </p>
+                <Button
+                  label="Create Your First Company"
+                  icon="fas fa-plus"
+                  className="p-button-lg"
+                  style={{ backgroundColor: "rgb(84, 22, 123)" }}
+                  onClick={handleCreateNew}
+                />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No companies found</h3>
-              <p className="text-gray-600 mb-4">
-                {searchTerm
-                  ? `No companies match "${searchTerm}". Try a different search term or create a new form.`
-                  : "No companies have been created yet. Start by creating your first form."}
-              </p>
-              <Button label="Create New Form" icon="fas fa-plus" style={{ backgroundColor: "rgb(84, 22, 123)" }} onClick={handleCreateNew} />
-            </div>
-          </Card>
+            </Card>
+          )
         )}
       </div>
     </div>
