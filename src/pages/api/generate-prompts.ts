@@ -24,13 +24,18 @@ interface GeneratePromptsRequest {
   }>;
 }
 
+interface PromptItem {
+  name: string;
+  prompt: string;
+}
+
 interface OutcomePrompt {
   outcomeName: string;
   outcomePath: string[];
-  callInsightsAgent: string;
-  callObjectionsAgent: string;
-  playbookChecksAgent: string;
-  variableScorecardAgent: string;
+  callInsights: PromptItem[];
+  callObjections: PromptItem[];
+  playbookChecks: PromptItem[];
+  variableScorecard: PromptItem[];
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -152,166 +157,195 @@ Keep the summary comprehensive but concise (400-600 words).`;
 }
 
 async function generateOutcomePrompt(outcome: any, companyContext: string): Promise<OutcomePrompt> {
-  // Generate Call Insights Agent Prompt
-  const callInsightsPrompt = await generateCallInsightsPrompt(outcome, companyContext);
+  // Generate individual prompts for each insight
+  const callInsights = await generateCallInsightsPrompts(outcome, companyContext);
 
-  // Generate Call Objections Agent Prompt
-  const callObjectionsPrompt = await generateCallObjectionsPrompt(outcome, companyContext);
+  // Generate individual prompts for each objection
+  const callObjections = await generateCallObjectionsPrompts(outcome, companyContext);
 
-  // Generate Playbook Checks Agent Prompt
-  const playbookChecksPrompt = await generatePlaybookChecksPrompt(outcome, companyContext);
+  // Generate individual prompts for each playbook check
+  const playbookChecks = await generatePlaybookChecksPrompts(outcome, companyContext);
 
-  // Generate Variable Scorecard Agent Prompt
-  const variableScorecardPrompt = await generateVariableScorecardPrompt(outcome, companyContext);
+  // Generate individual prompts for each scorecard item
+  const variableScorecard = await generateVariableScorecardPrompts(outcome, companyContext);
 
   return {
     outcomeName: outcome.nodeName,
     outcomePath: outcome.path,
-    callInsightsAgent: callInsightsPrompt,
-    callObjectionsAgent: callObjectionsPrompt,
-    playbookChecksAgent: playbookChecksPrompt,
-    variableScorecardAgent: variableScorecardPrompt,
+    callInsights,
+    callObjections,
+    playbookChecks,
+    variableScorecard,
   };
 }
 
-async function generateCallInsightsPrompt(outcome: any, companyContext: string): Promise<string> {
+async function generateCallInsightsPrompts(outcome: any, companyContext: string): Promise<PromptItem[]> {
   if (outcome.customerInsights.length === 0) {
-    return "No customer insights defined for this outcome.";
+    return [];
   }
 
-  const insightsText = outcome.customerInsights.map((insight: any) => `- ${insight.name}: ${insight.description}`).join("\n");
+  const prompts: PromptItem[] = [];
 
-  const prompt = `You are analyzing a sales call for the outcome: "${outcome.nodeName}" - ${outcome.nodeDescription}
+  for (const insight of outcome.customerInsights) {
+    const prompt = `You are analyzing a sales call for the outcome: "${outcome.nodeName}" - ${outcome.nodeDescription}
 
 Company Context:
 ${companyContext}
 
-Your task is to identify and extract the following customer insights from the call:
-${insightsText}
+Your task is to identify and extract the following customer insight from the call:
+
+Insight Name: ${insight.name}
+Description: ${insight.description}
 
 Instructions:
-1. Listen carefully for information related to each insight category
+1. Listen carefully for information related to this specific insight
 2. Extract specific quotes, data points, and behavioral cues
 3. Contextualize findings with the company's business goals and value proposition
 4. Identify patterns that align with or deviate from the expected customer profile
-5. Note any emotional indicators or sentiment shifts
+5. Note any emotional indicators or sentiment shifts related to this insight
 6. Flag any competitive mentions or market positioning discussions
 
-For each insight, provide:
+Provide:
 - Direct evidence from the call (quotes or paraphrases)
 - Relevance score (1-10) based on business goals
 - Actionable recommendations for follow-up
+- Whether this insight was found in the call (YES/NO)
 
-Format your response as structured JSON with clear categorization.`;
+Format your response as structured JSON.`;
 
-  return prompt;
-}
-
-async function generateCallObjectionsPrompt(outcome: any, companyContext: string): Promise<string> {
-  if (outcome.customerObjection.length === 0) {
-    return "No customer objections defined for this outcome.";
+    prompts.push({
+      name: insight.name,
+      prompt,
+    });
   }
 
-  const objectionsText = outcome.customerObjection.map((objection: any) => `- ${objection.name}: ${objection.description}`).join("\n");
+  return prompts;
+}
 
-  const prompt = `You are analyzing a sales call for the outcome: "${outcome.nodeName}" - ${outcome.nodeDescription}
+async function generateCallObjectionsPrompts(outcome: any, companyContext: string): Promise<PromptItem[]> {
+  if (outcome.customerObjection.length === 0) {
+    return [];
+  }
+
+  const prompts: PromptItem[] = [];
+
+  for (const objection of outcome.customerObjection) {
+    const prompt = `You are analyzing a sales call for the outcome: "${outcome.nodeName}" - ${outcome.nodeDescription}
 
 Company Context:
 ${companyContext}
 
-Your task is to identify and analyze the following customer objections from the call:
-${objectionsText}
+Your task is to identify and analyze the following customer objection from the call:
+
+Objection Name: ${objection.name}
+Description: ${objection.description}
 
 Instructions:
-1. Detect objections explicitly stated or implied through customer responses
+1. Detect if this objection was explicitly stated or implied through customer responses
 2. Categorize the type of objection (price, timing, authority, need, competition)
-3. Assess the strength and urgency of each objection
-4. Evaluate how well the sales representative addressed the objection
-5. Reference company value propositions that could counter each objection
-6. Identify any unaddressed concerns or hesitations
+3. Assess the strength and urgency of this objection
+4. Evaluate how well the sales representative addressed this objection
+5. Reference company value propositions that could counter this objection
+6. Identify any unaddressed concerns or hesitations related to this objection
 
-For each objection detected, provide:
-- Exact moment in call when objection was raised
+Provide:
+- Whether this objection was raised (YES/NO)
+- Exact moment in call when objection was raised (if applicable)
 - Customer's exact wording or sentiment
-- Sales rep's response and effectiveness rating
+- Sales rep's response and effectiveness rating (1-10)
 - Recommended handling strategy based on company positioning
 - Likelihood of objection being overcome (percentage)
 
 Format your response as structured JSON with actionable insights.`;
 
-  return prompt;
-}
-
-async function generatePlaybookChecksPrompt(outcome: any, companyContext: string): Promise<string> {
-  if (outcome.booleanScoreCard.length === 0) {
-    return "No playbook checks defined for this outcome.";
+    prompts.push({
+      name: objection.name,
+      prompt,
+    });
   }
 
-  const checksText = outcome.booleanScoreCard.map((check: any) => `- ${check.name}: ${check.description}`).join("\n");
+  return prompts;
+}
 
-  const prompt = `You are evaluating a sales call for the outcome: "${outcome.nodeName}" - ${outcome.nodeDescription}
+async function generatePlaybookChecksPrompts(outcome: any, companyContext: string): Promise<PromptItem[]> {
+  if (outcome.booleanScoreCard.length === 0) {
+    return [];
+  }
+
+  const prompts: PromptItem[] = [];
+
+  for (const check of outcome.booleanScoreCard) {
+    const prompt = `You are evaluating a sales call for the outcome: "${outcome.nodeName}" - ${outcome.nodeDescription}
 
 Company Context:
 ${companyContext}
 
-Your task is to verify the following playbook requirements (boolean checks) from the call:
-${checksText}
+Your task is to verify the following playbook requirement (boolean check) from the call:
+
+Check Name: ${check.name}
+Description: ${check.description}
 
 Instructions:
-1. For each criterion, determine if it was met (YES) or not met (NO)
+1. Determine if this criterion was met (YES) or not met (NO)
 2. Provide specific evidence or timestamp for your determination
 3. If not met, explain why and what was missing
 4. Rate the quality of execution if the criterion was met
 5. Consider company standards and quality expectations
 6. Identify any deviations from expected procedures
 
-For each playbook check, provide:
+Provide:
 - Status: YES or NO
 - Evidence: Specific call moment or quote
-- Quality Score: 1-10 (if met)
+- Quality Score: 1-10 (if met, otherwise N/A)
 - Gap Analysis: What was missing (if not met)
 - Impact Assessment: How this affects call success
 - Coaching Recommendation: Specific advice for improvement
 
 Format your response as structured JSON with clear pass/fail indicators.`;
 
-  return prompt;
-}
-
-async function generateVariableScorecardPrompt(outcome: any, companyContext: string): Promise<string> {
-  if (outcome.variableScoreCard.length === 0) {
-    return "No variable scorecard items defined for this outcome.";
+    prompts.push({
+      name: check.name,
+      prompt,
+    });
   }
 
-  const scorecardText = outcome.variableScoreCard
-    .map((item: any) => {
-      return `- ${item.name}: ${item.description}
-  Scale: 1-5 where:
-  1 = ${item.score1Desc || "Poor"}
-  2 = ${item.score2Desc || "Below Average"}
-  3 = ${item.score3Desc || "Average"}
-  4 = ${item.score4Desc || "Good"}
-  5 = ${item.score5Desc || "Excellent"}`;
-    })
-    .join("\n\n");
+  return prompts;
+}
 
-  const prompt = `You are scoring a sales call for the outcome: "${outcome.nodeName}" - ${outcome.nodeDescription}
+async function generateVariableScorecardPrompts(outcome: any, companyContext: string): Promise<PromptItem[]> {
+  if (outcome.variableScoreCard.length === 0) {
+    return [];
+  }
+
+  const prompts: PromptItem[] = [];
+
+  for (const item of outcome.variableScoreCard) {
+    const prompt = `You are scoring a sales call for the outcome: "${outcome.nodeName}" - ${outcome.nodeDescription}
 
 Company Context:
 ${companyContext}
 
-Your task is to score the following performance metrics on a 1-5 scale:
-${scorecardText}
+Your task is to score the following performance metric on a 1-5 scale:
+
+Metric Name: ${item.name}
+Description: ${item.description}
+
+Scale Definition:
+1 = ${item.score1Desc || "Poor"}
+2 = ${item.score2Desc || "Below Average"}
+3 = ${item.score3Desc || "Average"}
+4 = ${item.score4Desc || "Good"}
+5 = ${item.score5Desc || "Excellent"}
 
 Instructions:
-1. Evaluate each metric carefully against the provided scale
+1. Evaluate this metric carefully against the provided scale
 2. Consider company standards and industry best practices
 3. Provide specific evidence for your score
 4. Be objective and consistent in your evaluation
 5. Consider the context of the call outcome and customer situation
 6. Reference quality standards from company documentation
 
-For each metric, provide:
+Provide:
 - Score: 1-5 based on the provided scale
 - Justification: Specific evidence from the call
 - Key Moments: Timestamps or quotes supporting your score
@@ -321,5 +355,11 @@ For each metric, provide:
 
 Format your response as structured JSON with detailed scoring rationale.`;
 
-  return prompt;
+    prompts.push({
+      name: item.name,
+      prompt,
+    });
+  }
+
+  return prompts;
 }

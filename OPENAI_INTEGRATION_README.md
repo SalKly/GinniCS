@@ -129,10 +129,46 @@ The generated JSON file contains:
     {
       "outcomeName": "Sales Inquiry",
       "outcomePath": ["Root", "Sales", "Inquiry"],
-      "callInsightsAgent": "Detailed prompt for analyzing insights...",
-      "callObjectionsAgent": "Detailed prompt for analyzing objections...",
-      "playbookChecksAgent": "Detailed prompt for verifying playbook steps...",
-      "variableScorecardAgent": "Detailed prompt for scoring performance..."
+      "callInsights": [
+        {
+          "name": "Budget Discussion",
+          "prompt": "Detailed prompt for detecting budget discussions..."
+        },
+        {
+          "name": "Timeline Urgency",
+          "prompt": "Detailed prompt for detecting timeline urgency..."
+        }
+      ],
+      "callObjections": [
+        {
+          "name": "Price Concern",
+          "prompt": "Detailed prompt for analyzing price objections..."
+        },
+        {
+          "name": "Competitor Comparison",
+          "prompt": "Detailed prompt for analyzing competitor mentions..."
+        }
+      ],
+      "playbookChecks": [
+        {
+          "name": "Did rep introduce themselves?",
+          "prompt": "Detailed prompt for checking introduction..."
+        },
+        {
+          "name": "Did rep ask discovery questions?",
+          "prompt": "Detailed prompt for checking discovery..."
+        }
+      ],
+      "variableScorecard": [
+        {
+          "name": "Rapport Building",
+          "prompt": "Detailed prompt for scoring rapport building..."
+        },
+        {
+          "name": "Product Knowledge",
+          "prompt": "Detailed prompt for scoring product knowledge..."
+        }
+      ]
     }
     // ... more outcomes
   ]
