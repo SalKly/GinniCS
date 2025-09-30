@@ -48,7 +48,7 @@ export function CheckboxField<T extends FieldValues>({
               checked={field.value || false}
               onChange={(e) => {
                 field.onChange(e.checked);
-                if (onChange) onChange(e.checked);
+                if (onChange) onChange(e.checked ? "true" : "false");
               }}
               ref={field.ref}
               readOnly={readOnly === true}

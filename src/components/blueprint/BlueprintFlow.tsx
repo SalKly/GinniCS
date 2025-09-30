@@ -554,7 +554,7 @@ export default function BlueprintFlow({ blueprintData, onClose }: BlueprintFlowP
             nodeColor={(n) => (n.id === selectedNodeId ? SOFT_PRIMARY : "#F3F4F6")}
             maskColor="rgba(0,0,0,0.05)"
           />
-          <Background variant="dots" gap={14} size={1} />
+          <Background gap={14} size={1} />
         </ReactFlow>
       </div>
 

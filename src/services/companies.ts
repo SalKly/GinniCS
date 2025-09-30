@@ -252,10 +252,12 @@ export async function saveFormProgress(
       ...existingForm.form_data,
       ...partialFormData,
       // Ensure business info is properly merged
-      businessInfo: {
-        ...existingForm.form_data.businessInfo,
-        ...partialFormData.businessInfo,
-      },
+      businessInfo: partialFormData.businessInfo
+        ? {
+            ...existingForm.form_data.businessInfo,
+            ...partialFormData.businessInfo,
+          }
+        : existingForm.form_data.businessInfo,
     };
   } else {
     // Create new form data with defaults

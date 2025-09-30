@@ -65,10 +65,10 @@ export function SelectField<T extends FieldValues>({
             disabled={disabled === true}
             placeholder={placeholder}
             className={classNames({ "w-full": true, "p-invalid border-red-500 border-2": fieldState.invalid })}
-            onFocus={(e) => onFocus && onFocus(e.value)}
+            onFocus={(e) => onFocus && onFocus(e.target.value || "")}
             onBlur={(e) => {
               field.onBlur();
-              if (onBlur) onBlur(e.value);
+              if (onBlur) onBlur(e.target.value || "");
             }}
           />
           {fieldState.error && <span className="FieldError">{fieldState.error.message}</span>}
