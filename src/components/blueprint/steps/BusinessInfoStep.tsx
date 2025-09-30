@@ -186,7 +186,7 @@ export function BusinessInfoStep({ formState, onUpdateFormState, onNext, onPrevi
                   <i className="fas fa-cloud-upload-alt text-purple-700 text-xl"></i>
                 </div>
                 <p className="text-gray-600 mb-2">{fileName ? `Selected: ${fileName}` : "Click to upload QA manual"}</p>
-                <p className="text-sm text-gray-500">PDF, DOC, DOCX files accepted (Max 10MB)</p>
+                <p className="text-sm text-gray-500">PDF ONLY (Max 10MB)</p>
               </div>
             </div>
 
