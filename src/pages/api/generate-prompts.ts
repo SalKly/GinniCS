@@ -53,11 +53,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Generate context about the company using OpenAI
     const companyContext = await generateCompanyContext(businessInfo);
 
+    // Generate GLOBAL transcript prompt (one for all outcomes)
+    const transcriptPrompt = generateGlobalTranscriptPrompt(callOutcomes, companyContext);
+
     // Generate prompts for each call outcome
     const outcomePrompts: OutcomePrompt[] = [];
 
     for (const outcome of callOutcomes) {
-      const prompt = await generateOutcomePrompt(outcome, companyContext);
+      const prompt = generateOutcomePrompt(outcome);
       outcomePrompts.push(prompt);
     }
 
@@ -71,6 +74,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           "You work as an AI assistant in Ginni and your job is to support other agents with the required data and prompt so they can do their job as conversational intelligence that listen to calls and return insightful data from them.",
       },
       companyContext,
+      transcriptPrompt, // GLOBAL transcript prompt
       outcomePrompts,
     };
 
@@ -156,18 +160,12 @@ Keep the summary comprehensive but concise (400-600 words).`;
   }
 }
 
-async function generateOutcomePrompt(outcome: any, companyContext: string): Promise<OutcomePrompt> {
-  // Generate individual prompts for each insight
-  const callInsights = await generateCallInsightsPrompts(outcome, companyContext);
-
-  // Generate individual prompts for each objection
-  const callObjections = await generateCallObjectionsPrompts(outcome, companyContext);
-
-  // Generate individual prompts for each playbook check
-  const playbookChecks = await generatePlaybookChecksPrompts(outcome, companyContext);
-
-  // Generate individual prompts for each scorecard item
-  const variableScorecard = await generateVariableScorecardPrompts(outcome, companyContext);
+function generateOutcomePrompt(outcome: any): OutcomePrompt {
+  // Generate individual prompts for each item (with brief context)
+  const callInsights = generateCallInsightsPrompts(outcome);
+  const callObjections = generateCallObjectionsPrompts(outcome);
+  const playbookChecks = generatePlaybookChecksPrompts(outcome);
+  const variableScorecard = generateVariableScorecardPrompts(outcome);
 
   return {
     outcomeName: outcome.nodeName,
@@ -179,7 +177,74 @@ async function generateOutcomePrompt(outcome: any, companyContext: string): Prom
   };
 }
 
-async function generateCallInsightsPrompts(outcome: any, companyContext: string): Promise<PromptItem[]> {
+// STAGE 1: Generate GLOBAL transcript prompt (understands ALL outcomes)
+function generateGlobalTranscriptPrompt(allOutcomes: any[], companyContext: string): string {
+  // Build detailed outcome descriptions
+  const outcomeDescriptions = allOutcomes
+    .map((outcome) => {
+      return `
+## ${outcome.nodeName}
+Path: ${outcome.path.join(" → ")}
+Description: ${outcome.nodeDescription}
+
+What to listen for in this type of call:
+${outcome.customerInsights.length > 0 ? `- Customer Insights: ${outcome.customerInsights.map((i: any) => i.name).join(", ")}` : ""}
+${outcome.customerObjection.length > 0 ? `- Objections: ${outcome.customerObjection.map((o: any) => o.name).join(", ")}` : ""}
+${outcome.booleanScoreCard.length > 0 ? `- Playbook Checks: ${outcome.booleanScoreCard.map((c: any) => c.name).join(", ")}` : ""}
+${outcome.variableScoreCard.length > 0 ? `- Performance Metrics: ${outcome.variableScoreCard.map((s: any) => s.name).join(", ")}` : ""}
+`;
+    })
+    .join("\n");
+
+  const prompt = `You are a conversational intelligence agent working for Ginni. Your job is to:
+1. Listen to a sales call audio
+2. Understand what TYPE of call this is (which outcome category it belongs to)
+3. Create a detailed, accurate transcript
+
+==================================================
+COMPANY CONTEXT (CRITICAL - Read carefully):
+==================================================
+${companyContext}
+
+==================================================
+CALL OUTCOME TYPES (Learn these thoroughly):
+==================================================
+Below are ALL possible outcome types for this business. Each call will belong to ONE of these categories.
+${outcomeDescriptions}
+
+==================================================
+YOUR TASK:
+==================================================
+1. **Listen to the call carefully**
+2. **Determine which outcome type** this call belongs to based on the conversation
+3. **Create a detailed transcript** with:
+   - All dialogue from both sales representative and customer
+   - Timestamps for key moments (e.g., [02:34])
+   - Speaker identification (Rep/Customer)
+   - Emotional cues and tone (e.g., [customer sounds hesitant], [rep enthusiastic])
+   - Important pauses or interruptions
+
+==================================================
+OUTPUT FORMAT:
+==================================================
+First, state the outcome type:
+OUTCOME: [Which outcome type from the list above]
+
+Then provide the transcript:
+[00:00] Rep: [Opening statement]
+[00:15] Customer: [Response]
+[00:32] Rep: [Follow-up]
+...
+
+Include [notes in brackets] for context, tone, or non-verbal cues.
+
+REMEMBER: Understanding the business context and outcome types is CRITICAL for accurate categorization and transcription.`;
+
+  return prompt;
+}
+
+// STAGE 2: Generate analysis prompts (receive transcript text + brief context)
+function generateCallInsightsPrompts(outcome: any): PromptItem[] {
   if (outcome.customerInsights.length === 0) {
     return [];
   }
@@ -187,31 +252,33 @@ async function generateCallInsightsPrompts(outcome: any, companyContext: string)
   const prompts: PromptItem[] = [];
 
   for (const insight of outcome.customerInsights) {
-    const prompt = `You are analyzing a sales call for the outcome: "${outcome.nodeName}" - ${outcome.nodeDescription}
+    const prompt = `CALL OUTCOME: ${outcome.nodeName} - ${outcome.nodeDescription}
 
-Company Context:
-${companyContext}
+You are analyzing a call transcript to extract a specific customer insight.
 
-Your task is to identify and extract the following customer insight from the call:
-
-Insight Name: ${insight.name}
+INSIGHT TO EXTRACT:
+Name: ${insight.name}
 Description: ${insight.description}
 
-Instructions:
-1. Listen carefully for information related to this specific insight
-2. Extract specific quotes, data points, and behavioral cues
-3. Contextualize findings with the company's business goals and value proposition
-4. Identify patterns that align with or deviate from the expected customer profile
-5. Note any emotional indicators or sentiment shifts related to this insight
-6. Flag any competitive mentions or market positioning discussions
+INSTRUCTIONS:
+Read the transcript and identify if this insight appears in the conversation.
 
-Provide:
-- Direct evidence from the call (quotes or paraphrases)
-- Relevance score (1-10) based on business goals
-- Actionable recommendations for follow-up
-- Whether this insight was found in the call (YES/NO)
+Extract:
+1. Direct quotes or paraphrased evidence
+2. Timestamp/location in transcript
+3. Whether this insight was found (YES/NO)
+4. Relevance score (1-10)
+5. Key takeaways and recommended actions
 
-Format your response as structured JSON.`;
+OUTPUT FORMAT (JSON):
+{
+  "found": "YES/NO",
+  "evidence": "Specific quotes or paraphrases",
+  "timestamp": "When it occurred",
+  "relevanceScore": 1-10,
+  "keyTakeaways": "Summary of what this means",
+  "recommendations": ["Action 1", "Action 2"]
+}`;
 
     prompts.push({
       name: insight.name,
@@ -222,7 +289,7 @@ Format your response as structured JSON.`;
   return prompts;
 }
 
-async function generateCallObjectionsPrompts(outcome: any, companyContext: string): Promise<PromptItem[]> {
+function generateCallObjectionsPrompts(outcome: any): PromptItem[] {
   if (outcome.customerObjection.length === 0) {
     return [];
   }
@@ -230,33 +297,36 @@ async function generateCallObjectionsPrompts(outcome: any, companyContext: strin
   const prompts: PromptItem[] = [];
 
   for (const objection of outcome.customerObjection) {
-    const prompt = `You are analyzing a sales call for the outcome: "${outcome.nodeName}" - ${outcome.nodeDescription}
+    const prompt = `CALL OUTCOME: ${outcome.nodeName} - ${outcome.nodeDescription}
 
-Company Context:
-${companyContext}
+You are analyzing a call transcript to identify a specific customer objection.
 
-Your task is to identify and analyze the following customer objection from the call:
-
-Objection Name: ${objection.name}
+OBJECTION TO DETECT:
+Name: ${objection.name}
 Description: ${objection.description}
 
-Instructions:
-1. Detect if this objection was explicitly stated or implied through customer responses
-2. Categorize the type of objection (price, timing, authority, need, competition)
-3. Assess the strength and urgency of this objection
-4. Evaluate how well the sales representative addressed this objection
-5. Reference company value propositions that could counter this objection
-6. Identify any unaddressed concerns or hesitations related to this objection
+INSTRUCTIONS:
+Read the transcript and determine if this objection was raised (explicitly or implied).
 
-Provide:
-- Whether this objection was raised (YES/NO)
-- Exact moment in call when objection was raised (if applicable)
-- Customer's exact wording or sentiment
-- Sales rep's response and effectiveness rating (1-10)
-- Recommended handling strategy based on company positioning
-- Likelihood of objection being overcome (percentage)
+Analyze:
+1. Was this objection raised? (YES/NO)
+2. Customer's exact wording or sentiment
+3. How did the sales rep respond?
+4. How effective was the response? (1-10)
+5. Was the objection overcome?
 
-Format your response as structured JSON with actionable insights.`;
+OUTPUT FORMAT (JSON):
+{
+  "raised": "YES/NO",
+  "customerQuote": "What customer said",
+  "timestamp": "When it occurred",
+  "objectionType": "price/timing/authority/need/competition",
+  "strength": "low/medium/high",
+  "repResponse": "How rep handled it",
+  "effectiveness": 1-10,
+  "overcomeLikelihood": "percentage",
+  "recommendedStrategy": "How to better handle this"
+}`;
 
     prompts.push({
       name: objection.name,
@@ -267,7 +337,7 @@ Format your response as structured JSON with actionable insights.`;
   return prompts;
 }
 
-async function generatePlaybookChecksPrompts(outcome: any, companyContext: string): Promise<PromptItem[]> {
+function generatePlaybookChecksPrompts(outcome: any): PromptItem[] {
   if (outcome.booleanScoreCard.length === 0) {
     return [];
   }
@@ -275,33 +345,32 @@ async function generatePlaybookChecksPrompts(outcome: any, companyContext: strin
   const prompts: PromptItem[] = [];
 
   for (const check of outcome.booleanScoreCard) {
-    const prompt = `You are evaluating a sales call for the outcome: "${outcome.nodeName}" - ${outcome.nodeDescription}
+    const prompt = `CALL OUTCOME: ${outcome.nodeName} - ${outcome.nodeDescription}
 
-Company Context:
-${companyContext}
+You are evaluating a call transcript against a specific playbook requirement.
 
-Your task is to verify the following playbook requirement (boolean check) from the call:
-
-Check Name: ${check.name}
+PLAYBOOK CHECK:
+Name: ${check.name}
 Description: ${check.description}
 
-Instructions:
-1. Determine if this criterion was met (YES) or not met (NO)
-2. Provide specific evidence or timestamp for your determination
-3. If not met, explain why and what was missing
-4. Rate the quality of execution if the criterion was met
-5. Consider company standards and quality expectations
-6. Identify any deviations from expected procedures
+INSTRUCTIONS:
+Read the transcript and determine if this requirement was met.
 
-Provide:
-- Status: YES or NO
-- Evidence: Specific call moment or quote
-- Quality Score: 1-10 (if met, otherwise N/A)
-- Gap Analysis: What was missing (if not met)
-- Impact Assessment: How this affects call success
-- Coaching Recommendation: Specific advice for improvement
+Evaluate:
+1. Was this requirement met? (YES/NO)
+2. Find evidence in the transcript
+3. If met, how well was it executed? (1-10)
+4. If not met, what was missing?
 
-Format your response as structured JSON with clear pass/fail indicators.`;
+OUTPUT FORMAT (JSON):
+{
+  "status": "YES/NO",
+  "evidence": "Quote or description from transcript",
+  "timestamp": "When it occurred (or should have occurred)",
+  "qualityScore": 1-10 (if YES, otherwise "N/A"),
+  "gapAnalysis": "What was missing or could improve",
+  "coachingTip": "Specific advice for the rep"
+}`;
 
     prompts.push({
       name: check.name,
@@ -312,7 +381,7 @@ Format your response as structured JSON with clear pass/fail indicators.`;
   return prompts;
 }
 
-async function generateVariableScorecardPrompts(outcome: any, companyContext: string): Promise<PromptItem[]> {
+function generateVariableScorecardPrompts(outcome: any): PromptItem[] {
   if (outcome.variableScoreCard.length === 0) {
     return [];
   }
@@ -320,40 +389,39 @@ async function generateVariableScorecardPrompts(outcome: any, companyContext: st
   const prompts: PromptItem[] = [];
 
   for (const item of outcome.variableScoreCard) {
-    const prompt = `You are scoring a sales call for the outcome: "${outcome.nodeName}" - ${outcome.nodeDescription}
+    const prompt = `CALL OUTCOME: ${outcome.nodeName} - ${outcome.nodeDescription}
 
-Company Context:
-${companyContext}
+You are scoring a call transcript on a specific performance metric.
 
-Your task is to score the following performance metric on a 1-5 scale:
-
-Metric Name: ${item.name}
+METRIC TO SCORE:
+Name: ${item.name}
 Description: ${item.description}
 
-Scale Definition:
+SCORING SCALE (1-5):
 1 = ${item.score1Desc || "Poor"}
 2 = ${item.score2Desc || "Below Average"}
 3 = ${item.score3Desc || "Average"}
 4 = ${item.score4Desc || "Good"}
 5 = ${item.score5Desc || "Excellent"}
 
-Instructions:
-1. Evaluate this metric carefully against the provided scale
-2. Consider company standards and industry best practices
-3. Provide specific evidence for your score
-4. Be objective and consistent in your evaluation
-5. Consider the context of the call outcome and customer situation
-6. Reference quality standards from company documentation
+INSTRUCTIONS:
+Read the transcript and score this metric based on the scale above.
 
 Provide:
-- Score: 1-5 based on the provided scale
-- Justification: Specific evidence from the call
-- Key Moments: Timestamps or quotes supporting your score
-- Strengths: What was done well
-- Improvement Areas: Specific recommendations
-- Impact on Outcome: How this metric affected the call result
+1. Score (1-5)
+2. Evidence from transcript
+3. What was done well
+4. What could improve
 
-Format your response as structured JSON with detailed scoring rationale.`;
+OUTPUT FORMAT (JSON):
+{
+  "score": 1-5,
+  "justification": "Why this score was given",
+  "evidence": "Quotes or moments from transcript",
+  "strengths": ["What rep did well"],
+  "improvements": ["Specific suggestions"],
+  "impact": "How this affected the call outcome"
+}`;
 
     prompts.push({
       name: item.name,

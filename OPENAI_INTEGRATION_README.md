@@ -2,7 +2,12 @@
 
 ## Overview
 
-This integration uses OpenAI's GPT-4 to generate enriched, context-aware prompts for call outcome analysis. The AI reads your company information, uploaded documents, and call outcomes structure to create detailed prompts for multiple conversational intelligence agents.
+This integration uses **Perplexity AI** (for web research) and **OpenAI's GPT-4** (for analysis) to generate enriched, context-aware prompts for call outcome analysis. The system creates prompts in a **two-stage approach**:
+
+1. **Stage 1: Transcript Extraction** - One prompt with full business context for extracting call transcripts
+2. **Stage 2: Analysis** - Individual focused prompts for analyzing the transcript
+
+The AI reads your company information (from web search + uploaded documents) and call outcomes structure to create detailed prompts for multiple conversational intelligence agents.
 
 ## Features
 
@@ -129,44 +134,47 @@ The generated JSON file contains:
     {
       "outcomeName": "Sales Inquiry",
       "outcomePath": ["Root", "Sales", "Inquiry"],
+
+      "transcriptPrompt": "STAGE 1: Agent listens to call and extracts transcript. Includes full business context, outcome details, and what to watch for...",
+
       "callInsights": [
         {
           "name": "Budget Discussion",
-          "prompt": "Detailed prompt for detecting budget discussions..."
+          "prompt": "STAGE 2: Read transcript and extract budget discussion..."
         },
         {
           "name": "Timeline Urgency",
-          "prompt": "Detailed prompt for detecting timeline urgency..."
+          "prompt": "STAGE 2: Read transcript and extract timeline urgency..."
         }
       ],
       "callObjections": [
         {
           "name": "Price Concern",
-          "prompt": "Detailed prompt for analyzing price objections..."
+          "prompt": "STAGE 2: Read transcript and detect price objections..."
         },
         {
           "name": "Competitor Comparison",
-          "prompt": "Detailed prompt for analyzing competitor mentions..."
+          "prompt": "STAGE 2: Read transcript and analyze competitor mentions..."
         }
       ],
       "playbookChecks": [
         {
           "name": "Did rep introduce themselves?",
-          "prompt": "Detailed prompt for checking introduction..."
+          "prompt": "STAGE 2: Read transcript and check if introduction occurred..."
         },
         {
           "name": "Did rep ask discovery questions?",
-          "prompt": "Detailed prompt for checking discovery..."
+          "prompt": "STAGE 2: Read transcript and check discovery questions..."
         }
       ],
       "variableScorecard": [
         {
           "name": "Rapport Building",
-          "prompt": "Detailed prompt for scoring rapport building..."
+          "prompt": "STAGE 2: Read transcript and score rapport building..."
         },
         {
           "name": "Product Knowledge",
-          "prompt": "Detailed prompt for scoring product knowledge..."
+          "prompt": "STAGE 2: Read transcript and score product knowledge..."
         }
       ]
     }
