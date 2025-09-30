@@ -512,7 +512,7 @@ export function BlueprintForm({ mode = "create", companyName = "", existingForm 
         {/* Header Section */}
         <div className="text-center mb-12">
           <div className="flex flex-col items-center justify-center">
-            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-700 to-purple-600 bg-clip-text text-transparent mb-4">
               Onboarding Blueprint Generator
             </h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
@@ -527,7 +527,7 @@ export function BlueprintForm({ mode = "create", companyName = "", existingForm 
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-6">
               <div className="flex items-center gap-4">
                 <div className="relative">
-                  <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-2xl flex items-center justify-center text-lg font-bold shadow-lg">
+                  <div className="w-14 h-14 bg-gradient-to-br from-purple-700 to-purple-800 text-white rounded-2xl flex items-center justify-center text-lg font-bold shadow-lg">
                     {getCurrentStepNumber()}
                     <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
                       <i className="fas fa-check text-xs text-white"></i>
@@ -548,7 +548,7 @@ export function BlueprintForm({ mode = "create", companyName = "", existingForm 
                           : formState.currentStep === "general"
                           ? "fa-sliders"
                           : "fa-tasks"
-                      } text-blue-600`}
+                      } text-purple-700`}
                     ></i>
                     {formState.currentStep === "business-info" && "Provide your business information"}
                     {formState.currentStep === "outcomes" && "Define your call outcomes"}
@@ -558,11 +558,11 @@ export function BlueprintForm({ mode = "create", companyName = "", existingForm 
                   </p>
                 </div>
               </div>
-              <div className="text-right bg-blue-50 px-6 py-3 rounded-xl border border-blue-100">
-                <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+              <div className="text-right bg-purple-50 px-6 py-3 rounded-xl border border-purple-100">
+                <div className="text-3xl font-bold bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent">
                   {Math.round(progressValue)}%
                 </div>
-                <div className="text-sm font-medium text-blue-600">Progress Complete</div>
+                <div className="text-sm font-medium text-purple-700">Progress Complete</div>
               </div>
             </div>
             <div className="relative">
@@ -594,7 +594,7 @@ export function BlueprintForm({ mode = "create", companyName = "", existingForm 
             {/* Save Status */}
             <div className="text-xs text-center">
               {isSaving ? (
-                <span className="text-blue-600">Saving...</span>
+                <span className="text-purple-700">Saving...</span>
               ) : lastSaved ? (
                 <span className="text-green-600">Saved {lastSaved.toLocaleTimeString()}</span>
               ) : (

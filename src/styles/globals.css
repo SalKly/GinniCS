@@ -6,14 +6,14 @@
 :root {
   --background: #ffffff;
   --foreground: #1f2937;
-  --primary: #2563eb;
-  --primary-light: #3b82f6;
-  --primary-dark: #1d4ed8;
+  --primary: #541a7b;
+  --primary-light: #6d2499;
+  --primary-dark: #3d1359;
   --secondary: #f8fafc;
   --muted: #64748b;
   --border: #e2e8f0;
   --input: #ffffff;
-  --ring: #2563eb;
+  --ring: #541a7b;
   --success: #10b981;
   --warning: #f59e0b;
   --danger: #ef4444;
@@ -93,11 +93,11 @@ body {
   background-color: var(--primary-light);
   border-color: var(--primary-light);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 4px 12px rgba(84, 22, 123, 0.3);
 }
 
 .p-button:focus {
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+  box-shadow: 0 0 0 3px rgba(84, 22, 123, 0.2);
   outline: none;
 }
 
@@ -148,7 +148,7 @@ body {
 .p-progressbar .p-progressbar-value {
   background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 50%, var(--primary) 100%);
   border-radius: 999px;
-  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+  box-shadow: 0 2px 4px rgba(84, 22, 123, 0.2);
   animation: shimmer 2s infinite linear;
   background-size: 200% 100%;
 }
@@ -192,7 +192,7 @@ body {
 .p-inputtextarea:focus,
 .p-dropdown:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+  box-shadow: 0 0 0 4px rgba(84, 22, 123, 0.15);
   outline: none;
   background-color: white;
 }
@@ -293,8 +293,8 @@ body {
 
 /* Info boxes */
 .info-box {
-  background-color: #eff6ff;
-  border: 1px solid #bfdbfe;
+  background-color: #f3e8ff;
+  border: 1px solid #d8b4fe;
   border-radius: 8px;
   padding: 1rem;
   margin-bottom: 1.5rem;
@@ -302,12 +302,12 @@ body {
 
 .info-box h4 {
   font-weight: 600;
-  color: #1e40af;
+  color: #541a7b;
   margin-bottom: 0.5rem;
 }
 
 .info-box p {
-  color: #1e3a8a;
+  color: #6d2499;
   font-size: 0.875rem;
   line-height: 1.5;
 }

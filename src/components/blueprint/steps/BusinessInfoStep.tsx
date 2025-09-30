@@ -108,7 +108,7 @@ export function BusinessInfoStep({ formState, onUpdateFormState, onNext, onPrevi
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <div className="inline-flex items-center justify-center w-10 h-10 bg-blue-600 text-white rounded-lg mb-3">
+        <div className="inline-flex items-center justify-center w-10 h-10 bg-purple-700 text-white rounded-lg mb-3">
           <i className="fas fa-building text-sm"></i>
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Business Information</h2>
@@ -117,12 +117,12 @@ export function BusinessInfoStep({ formState, onUpdateFormState, onNext, onPrevi
 
       <div className="info-box">
         <div className="flex items-start gap-3">
-          <div className="text-blue-600 mt-0.5">
+          <div className="text-purple-700 mt-0.5">
             <i className="fas fa-info-circle"></i>
           </div>
           <div>
-            <h4 className="font-semibold text-blue-900 mb-2">Why do we need this information?</h4>
-            <p className="text-blue-800">
+            <h4 className="font-semibold text-purple-900 mb-2">Why do we need this information?</h4>
+            <p className="text-purple-800">
               Your business name and goals help us personalize the blueprint generation process. The QA manual provides context about your current
               quality standards and processes, which helps us create more relevant evaluation criteria for your sales calls.
             </p>
@@ -178,12 +178,12 @@ export function BusinessInfoStep({ formState, onUpdateFormState, onNext, onPrevi
           <div className="space-y-4">
             {/* File Upload Area */}
             <div
-              className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors cursor-pointer"
+              className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-purple-400 transition-colors cursor-pointer"
               onClick={triggerFileUpload}
             >
               <div className="flex flex-col items-center">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-3">
-                  <i className="fas fa-cloud-upload-alt text-blue-600 text-xl"></i>
+                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mb-3">
+                  <i className="fas fa-cloud-upload-alt text-purple-700 text-xl"></i>
                 </div>
                 <p className="text-gray-600 mb-2">{fileName ? `Selected: ${fileName}` : "Click to upload QA manual"}</p>
                 <p className="text-sm text-gray-500">PDF, DOC, DOCX files accepted (Max 10MB)</p>
@@ -215,9 +215,9 @@ export function BusinessInfoStep({ formState, onUpdateFormState, onNext, onPrevi
 
             {/* PDF Parsing Status */}
             {isParsingPdf && (
-              <div className="flex items-center gap-3 bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                <p className="text-blue-800 font-medium">Parsing PDF document...</p>
+              <div className="flex items-center gap-3 bg-purple-50 border border-purple-200 rounded-lg p-4">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-700"></div>
+                <p className="text-purple-800 font-medium">Parsing PDF document...</p>
               </div>
             )}
 

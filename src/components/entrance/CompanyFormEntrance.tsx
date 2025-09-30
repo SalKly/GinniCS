@@ -187,7 +187,7 @@ export function CompanyFormEntrance() {
     if (!company.website) return <span className="text-gray-400">—</span>;
 
     return (
-      <a href={company.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">
+      <a href={company.website} target="_blank" rel="noopener noreferrer" className="text-purple-700 hover:text-purple-900">
         <i className="fas fa-external-link-alt mr-1"></i>
         Visit
       </a>
@@ -202,9 +202,7 @@ export function CompanyFormEntrance() {
       <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-600 text-white rounded-xl mb-4">
-            <i className="fas fa-building text-2xl"></i>
-          </div>
+          <img src="/GA_Logo_On-purple.png" alt="Ginni Logo" className="w-1/2 mx-auto" />
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Company Form Manager</h1>
           <p className="text-gray-600 max-w-2xl mx-auto">
             Create new forms or manage existing company forms. Search for your company or create a new one to get started.
@@ -234,8 +232,8 @@ export function CompanyFormEntrance() {
           {/* Search Existing Card */}
           <Card>
             <div className="p-6">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <i className="fas fa-search text-blue-600 text-xl"></i>
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                <i className="fas fa-search text-purple-700 text-xl"></i>
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Find Existing Company</h3>
               <p className="text-gray-600 mb-4">Search for an existing company to edit its form or view the evaluation tree.</p>
