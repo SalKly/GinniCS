@@ -14,15 +14,23 @@ export async function parsePdfToText(file: File): Promise<string> {
   try {
     // Dynamic import of pdfjs-dist to avoid SSR issues
     const pdfjs = await import("pdfjs-dist");
-    
-    // Set up the worker for PDF.js
-    pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+
+    // Set up the worker for PDF.js using local file from public directory
+    // This avoids CDN and CORS issues in production
+    pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
+
+    console.log(`PDF.js version: ${pdfjs.version}, Worker: ${pdfjs.GlobalWorkerOptions.workerSrc}`);
 
     // Convert File to ArrayBuffer
     const arrayBuffer = await file.arrayBuffer();
 
-    // Load the PDF document
-    const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
+    // Load the PDF document with error handling
+    const loadingTask = pdfjs.getDocument({
+      data: arrayBuffer,
+      verbosity: 0, // Reduce console noise
+    });
+
+    const pdf = await loadingTask.promise;
 
     let fullText = "";
 
@@ -44,6 +52,13 @@ export async function parsePdfToText(file: File): Promise<string> {
     return fullText.trim();
   } catch (error) {
     console.error("Error parsing PDF:", error);
+    // Provide more specific error messages
+    if (error instanceof Error) {
+      if (error.message.includes("TT:") || error.message.includes("undefined function")) {
+        throw new Error("PDF parsing failed due to a compatibility issue. Please try again or use a different PDF.");
+      }
+      throw new Error(`Failed to parse PDF: ${error.message}`);
+    }
     throw new Error("Failed to parse PDF document. Please ensure the file is a valid PDF.");
   }
 }
