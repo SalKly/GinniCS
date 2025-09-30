@@ -1,10 +1,4 @@
-import * as pdfjs from "pdfjs-dist";
 import type { TextItem } from "pdfjs-dist/types/src/display/api";
-
-// Set up the worker for PDF.js
-if (typeof window !== "undefined") {
-  pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
-}
 
 /**
  * Parses a PDF file and extracts text content
@@ -12,7 +6,18 @@ if (typeof window !== "undefined") {
  * @returns Promise<string> - The extracted text content
  */
 export async function parsePdfToText(file: File): Promise<string> {
+  // Only import pdfjs-dist on the client side when actually needed
+  if (typeof window === "undefined") {
+    throw new Error("PDF parsing is only available in the browser");
+  }
+
   try {
+    // Dynamic import of pdfjs-dist to avoid SSR issues
+    const pdfjs = await import("pdfjs-dist");
+    
+    // Set up the worker for PDF.js
+    pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+
     // Convert File to ArrayBuffer
     const arrayBuffer = await file.arrayBuffer();
 
