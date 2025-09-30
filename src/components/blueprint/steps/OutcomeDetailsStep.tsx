@@ -18,7 +18,7 @@ export function OutcomeDetailsStep({ formState, onUpdateFormState, onNext, onPre
   return (
     <div className="space-y-8">
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-10 h-10 bg-blue-600 text-white rounded-lg mb-3">
+        <div className="inline-flex items-center justify-center w-10 h-10 bg-purple-700 text-white rounded-lg mb-3">
           <i className="fas fa-flag text-sm"></i>
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Configure "{currentOutcome?.nodeName || "Outcome"}"</h2>
@@ -28,7 +28,7 @@ export function OutcomeDetailsStep({ formState, onUpdateFormState, onNext, onPre
       {/* Outcome Header */}
       <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 bg-blue-600 text-white rounded-lg flex items-center justify-center">
+          <div className="w-10 h-10 bg-purple-700 text-white rounded-lg flex items-center justify-center">
             <i className="fas fa-flag text-sm"></i>
           </div>
           <div>
@@ -65,7 +65,7 @@ export function OutcomeDetailsStep({ formState, onUpdateFormState, onNext, onPre
         title="Customer Insights"
         description="What information should be gathered about customers for this outcome"
         icon="fas fa-eye"
-        color="bg-blue-500"
+        color="bg-purple-700"
       />
 
       {/* Objections Section */}

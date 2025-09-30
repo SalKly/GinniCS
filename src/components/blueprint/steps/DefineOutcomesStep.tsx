@@ -110,7 +110,7 @@ export function DefineOutcomesStep({ formState, onUpdateFormState, onNext, onPre
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <div className="inline-flex items-center justify-center w-10 h-10 bg-blue-600 text-white rounded-lg mb-3">
+        <div className="inline-flex items-center justify-center w-10 h-10 bg-purple-700 text-white rounded-lg mb-3">
           <i className="fas fa-flag text-sm"></i>
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Define Call Outcomes</h2>
@@ -121,12 +121,12 @@ export function DefineOutcomesStep({ formState, onUpdateFormState, onNext, onPre
 
       <div className="info-box">
         <div className="flex items-start gap-3">
-          <div className="text-blue-600 mt-0.5">
+          <div className="text-purple-700 mt-0.5">
             <i className="fas fa-info-circle"></i>
           </div>
           <div>
-            <h4 className="font-semibold text-blue-900 mb-2">What are Call Outcomes?</h4>
-            <p className="text-blue-800">
+            <h4 className="font-semibold text-purple-900 mb-2">What are Call Outcomes?</h4>
+            <p className="text-purple-800">
               The General Outcome contains criteria that apply to all calls. Specific outcomes are the different results that can happen at the end of
               a sales call. Examples include "Demo Scheduled", "Not Interested", "Needs Follow-up", etc. Each outcome will have its own set of
               evaluation criteria and coaching guidelines. You can also add nested outcomes within each outcome to create more specific scenarios.
@@ -189,12 +189,12 @@ export function DefineOutcomesStep({ formState, onUpdateFormState, onNext, onPre
                     className="p-button-text p-button-sm"
                     onClick={() => toggleOutcomeExpanded(index)}
                   />
-                  <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-semibold">
+                  <div className="w-6 h-6 bg-purple-700 text-white rounded-full flex items-center justify-center text-xs font-semibold">
                     {index + 1}
                   </div>
                   <h3 className="text-xl font-semibold text-gray-900">Outcome {index + 1}</h3>
                   {nestedOutcomes.length > 0 && (
-                    <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">{nestedOutcomes.length} nested</span>
+                    <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full">{nestedOutcomes.length} nested</span>
                   )}
                 </div>
                 <div className="flex items-center gap-2">

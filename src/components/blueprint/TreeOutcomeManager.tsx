@@ -92,7 +92,7 @@ export function TreeOutcomeManager({ control, fieldName, parentOutcomeName, leve
 
   // Get background color based on level
   const getBackgroundColor = () => {
-    if (level === 0) return "bg-blue-50 border-blue-200";
+    if (level === 0) return "bg-purple-50 border-purple-200";
     if (level === 1) return "bg-green-50 border-green-200";
     if (level === 2) return "bg-purple-50 border-purple-200";
     return "bg-gray-50 border-gray-200";
@@ -100,7 +100,7 @@ export function TreeOutcomeManager({ control, fieldName, parentOutcomeName, leve
 
   // Get border color based on level
   const getBorderColor = () => {
-    if (level === 0) return "border-l-blue-400";
+    if (level === 0) return "border-l-purple-400";
     if (level === 1) return "border-l-green-400";
     if (level === 2) return "border-l-purple-400";
     return "border-l-gray-400";
@@ -108,7 +108,7 @@ export function TreeOutcomeManager({ control, fieldName, parentOutcomeName, leve
 
   // Get level badge color
   const getLevelBadgeColor = () => {
-    if (level === 0) return "bg-blue-600";
+    if (level === 0) return "bg-purple-700";
     if (level === 1) return "bg-green-600";
     if (level === 2) return "bg-purple-600";
     return "bg-gray-600";
@@ -191,7 +191,7 @@ export function TreeOutcomeManager({ control, fieldName, parentOutcomeName, leve
                     />
 
                     {/* Level Indicator */}
-                    <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-semibold">
+                    <div className="w-6 h-6 bg-purple-700 text-white rounded-full flex items-center justify-center text-xs font-semibold">
                       {index + 1}
                     </div>
 
@@ -269,7 +269,7 @@ export function TreeOutcomeManager({ control, fieldName, parentOutcomeName, leve
                           title="Customer Insights"
                           description="What insights are relevant for this scenario"
                           icon="fas fa-eye"
-                          color="bg-blue-500"
+                          color="bg-purple-700"
                         />
 
                         {/* Objections */}

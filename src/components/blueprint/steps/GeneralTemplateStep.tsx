@@ -30,7 +30,7 @@ export function GeneralTemplateStep({ formState, onUpdateFormState, onNext, onPr
         title="Customer Insights"
         description="What insights should be captured about customers during calls"
         icon="fas fa-eye"
-        color="bg-blue-500"
+        color="bg-purple-700"
       />
 
       {/* Objections Section */}
