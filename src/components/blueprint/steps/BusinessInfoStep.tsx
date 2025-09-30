@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { Control, useWatch } from "react-hook-form";
+import { Control, UseFormSetValue, useWatch } from "react-hook-form";
 import { Button } from "primereact/button";
 import { InputTextField } from "../../form/InputTextField";
 import { TextAreaField } from "../../form/TextAreaField";
@@ -8,9 +8,10 @@ import { parsePdfToText, isPdfFile, formatExtractedText } from "../../../utils/p
 
 interface BusinessInfoStepProps extends StepProps {
   control: Control<any>;
+  setValue: UseFormSetValue<any>;
 }
 
-export function BusinessInfoStep({ formState, onUpdateFormState, onNext, onPrevious, onComplete, control }: BusinessInfoStepProps) {
+export function BusinessInfoStep({ formState, onUpdateFormState, onNext, onPrevious, onComplete, control, setValue }: BusinessInfoStepProps) {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState<string>("");
   const [isParsingPdf, setIsParsingPdf] = useState<boolean>(false);
@@ -25,6 +26,7 @@ export function BusinessInfoStep({ formState, onUpdateFormState, onNext, onPrevi
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+
     if (file) {
       setUploadedFile(file);
       setFileName(file.name);
@@ -45,9 +47,13 @@ export function BusinessInfoStep({ formState, onUpdateFormState, onNext, onPrevi
       // If it's a PDF, parse it for text content
       if (isPdfFile(file)) {
         setIsParsingPdf(true);
+
         try {
           const extractedText = await parsePdfToText(file);
           const formattedText = formatExtractedText(extractedText);
+
+          // Update react-hook-form value directly (this will trigger the UI update)
+          setValue("businessInfo.documentTranscription", formattedText, { shouldValidate: true });
 
           // Update the form data with transcription
           onUpdateFormState({

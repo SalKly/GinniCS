@@ -19,8 +19,6 @@ export async function parsePdfToText(file: File): Promise<string> {
     // This avoids CDN and CORS issues in production
     pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 
-    console.log(`PDF.js version: ${pdfjs.version}, Worker: ${pdfjs.GlobalWorkerOptions.workerSrc}`);
-
     // Convert File to ArrayBuffer
     const arrayBuffer = await file.arrayBuffer();
 

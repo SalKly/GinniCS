@@ -459,6 +459,7 @@ export function BlueprintForm({ mode = "create", companyName = "", existingForm 
             onPrevious={handlePrevious}
             onComplete={handleComplete}
             control={control}
+            setValue={setValue}
           />
         );
       case "outcomes":
