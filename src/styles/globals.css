@@ -1,0 +1,402 @@
+@import "tailwindcss";
+@import "primereact/resources/themes/lara-light-blue/theme.css" layer(primereact);
+@import "primereact/resources/primereact.min.css";
+@import "@fortawesome/fontawesome-free/css/all.min.css";
+
+:root {
+  --background: #ffffff;
+  --foreground: #1f2937;
+  --primary: #2563eb;
+  --primary-light: #3b82f6;
+  --primary-dark: #1d4ed8;
+  --secondary: #f8fafc;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --input: #ffffff;
+  --ring: #2563eb;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-light: var(--primary-light);
+  --color-primary-dark: var(--primary-dark);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom animations for modal */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.animate-slideInRight {
+  animation: slideInRight 0.3s ease-in-out;
+}
+
+/* Custom styles for the blueprint form */
+.FieldError {
+  color: #dc2626;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+/* PrimeReact customizations */
+.p-button {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.p-button:hover {
+  background-color: var(--primary-light);
+  border-color: var(--primary-light);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.p-button:focus {
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+  outline: none;
+}
+
+.p-button-outlined {
+  background-color: transparent;
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.p-button-outlined:hover {
+  background-color: var(--primary);
+  color: white;
+}
+
+.p-button-success {
+  background-color: var(--success);
+  border-color: var(--success);
+}
+
+.p-button-success:hover {
+  background-color: #059669;
+  border-color: #059669;
+}
+
+.p-button-danger {
+  background-color: var(--danger);
+  border-color: var(--danger);
+}
+
+.p-button-danger:hover {
+  background-color: #dc2626;
+  border-color: #dc2626;
+}
+
+.p-button-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.p-progressbar {
+  background-color: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+  height: 12px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.p-progressbar .p-progressbar-value {
+  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 50%, var(--primary) 100%);
+  border-radius: 999px;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+  animation: shimmer 2s infinite linear;
+  background-size: 200% 100%;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.p-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  background: white;
+}
+
+.p-inputtext,
+.p-inputtextarea,
+.p-dropdown {
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 0.875rem 1.25rem;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  background-color: #f8fafc;
+  width: 100%;
+}
+
+.p-inputtext:hover,
+.p-inputtextarea:hover,
+.p-dropdown:hover {
+  border-color: var(--primary-light);
+  background-color: white;
+}
+
+.p-inputtext:focus,
+.p-inputtextarea:focus,
+.p-dropdown:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+  outline: none;
+  background-color: white;
+}
+
+/* Required field indicator */
+.field-required::after {
+  content: "*";
+  color: var(--danger);
+  margin-left: 4px;
+}
+
+/* Field label styles */
+.field-label {
+  font-weight: 500;
+  color: var(--foreground);
+  margin-bottom: 0.5rem;
+  font-size: 0.9375rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.field-label i {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+/* Field error styles */
+.FieldError {
+  color: var(--danger);
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.FieldError::before {
+  content: "⚠";
+  font-size: 1rem;
+}
+
+.p-checkbox .p-checkbox-box {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.p-checkbox .p-checkbox-box.p-highlight {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+/* Custom card styles */
+.blueprint-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+  margin-bottom: 2rem;
+}
+
+.blueprint-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+}
+
+.blueprint-card h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--foreground);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.blueprint-card h3 i {
+  color: var(--primary);
+  font-size: 1.125rem;
+}
+
+/* Section headers */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.section-header i {
+  font-size: 1.25rem;
+}
+
+/* Info boxes */
+.info-box {
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.info-box h4 {
+  font-weight: 600;
+  color: #1e40af;
+  margin-bottom: 0.5rem;
+}
+
+.info-box p {
+  color: #1e3a8a;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.warning-box {
+  background-color: #fffbeb;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.warning-box h4 {
+  font-weight: 600;
+  color: #92400e;
+  margin-bottom: 0.5rem;
+}
+
+.warning-box p {
+  color: #a16207;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.success-box {
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.success-box h4 {
+  font-weight: 600;
+  color: #166534;
+  margin-bottom: 0.5rem;
+}
+
+.success-box p {
+  color: #15803d;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* Form container styles */
+.form-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .form-container {
+    max-width: 100%;
+    padding: 1rem 0.75rem;
+  }
+}
+
+/* Form section spacing */
+.form-section {
+  margin-bottom: 2.5rem;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.form-section:last-child {
+  margin-bottom: 0;
+}
+
+.form-section-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border);
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: var(--muted);
+}
+
+.empty-state i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  display: block;
+  opacity: 0.5;
+}
+
+.empty-state p {
+  font-size: 0.875rem;
+  margin: 0;
+}
