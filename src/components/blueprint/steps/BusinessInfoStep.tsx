@@ -191,7 +191,7 @@ export function BusinessInfoStep({ formState, onUpdateFormState, onNext, onPrevi
             </div>
 
             {/* Hidden file input */}
-            <input ref={fileInputRef} type="file" accept=".pdf,.doc,.docx" onChange={handleFileUpload} className="hidden" />
+            <input ref={fileInputRef} type="file" accept=".pdf" onChange={handleFileUpload} className="hidden" />
 
             {/* File Actions */}
             {uploadedFile && (
