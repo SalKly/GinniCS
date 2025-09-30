@@ -58,14 +58,19 @@ This context is used to enrich all generated prompts, making them specific to yo
 
 ### 2. Configure the Environment
 
-Create a `.env.local` file in the `ginni-form` directory:
+Create a `.env.local` file in the root directory:
 
 ```bash
-# In the ginni-form directory
+# OpenAI API Key (required)
 OPENAI_API_KEY=sk-proj-xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+# Perplexity API Key (optional but recommended for web search)
+PERPLEXITY_API_KEY=pplx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
 **Important**: Never commit this file to version control. It's already in `.gitignore`.
+
+**Note**: With the Perplexity integration, the system now performs real-time web searches to gather factual information about companies, making your prompts even more accurate and context-rich! See `PERPLEXITY_INTEGRATION_README.md` for details.
 
 ### 3. Restart the Development Server
 

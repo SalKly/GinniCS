@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import OpenAI from "openai";
+import { searchCompanyInfo } from "../../services/perplexitySearch";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || "",
@@ -81,23 +82,45 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 async function generateCompanyContext(businessInfo: any): Promise<string> {
   const { businessName, businessGoals, companyWebsite, documentTranscription } = businessInfo;
 
+  // Step 1: Get real-time web information about the company using Perplexity
+  let webSearchResults = "";
+  let searchCitations: string[] = [];
+
+  try {
+    console.log(`Searching web for company: ${businessName}...`);
+    const searchResult = await searchCompanyInfo(businessName, companyWebsite);
+    webSearchResults = searchResult.answer;
+    searchCitations = searchResult.citations;
+    console.log(`Web search completed. Found ${searchCitations.length} citations.`);
+  } catch (error) {
+    console.warn("Perplexity search failed, continuing with available data:", error);
+    webSearchResults = "Web search unavailable - using provided information only.";
+  }
+
+  // Step 2: Combine web search results with provided information for OpenAI analysis
   const contextPrompt = `Analyze the following company information and create a comprehensive context summary that will be used to enrich conversational intelligence prompts:
 
 Company Name: ${businessName}
 Website: ${companyWebsite || "Not provided"}
 Business Goals: ${businessGoals}
 
+WEB SEARCH RESULTS (Real-time information about this company):
+${webSearchResults}
+${searchCitations.length > 0 ? `\nSources: ${searchCitations.join(", ")}` : ""}
+
 ${documentTranscription ? `QA Manual/Documentation:\n${documentTranscription.substring(0, 4000)}` : "No QA documentation provided"}
 
-Please provide:
+Please synthesize all the above information and provide:
 1. Industry and business type analysis
-2. Key value propositions and offerings
+2. Key value propositions and offerings (combine web research with stated goals)
 3. Target customer profile
 4. Communication style and brand voice
 5. Quality standards and expectations based on the documentation
 6. Unique selling points and differentiators
+7. Market position and competitive context (from web research)
 
-Keep the summary comprehensive but concise (300-500 words).`;
+Prioritize factual web research data, then supplement with provided business goals and documentation.
+Keep the summary comprehensive but concise (400-600 words).`;
 
   try {
     const completion = await openai.chat.completions.create({
@@ -105,7 +128,8 @@ Keep the summary comprehensive but concise (300-500 words).`;
       messages: [
         {
           role: "system",
-          content: "You are a business analyst expert in understanding company profiles and creating context for sales coaching systems.",
+          content:
+            "You are a business analyst expert in understanding company profiles and creating context for sales coaching systems. You synthesize web research data with internal company information to create comprehensive profiles.",
         },
         {
           role: "user",
@@ -113,12 +137,16 @@ Keep the summary comprehensive but concise (300-500 words).`;
         },
       ],
       temperature: 0.7,
-      max_tokens: 1000,
+      max_tokens: 1500,
     });
 
     return completion.choices[0]?.message?.content || "Unable to generate company context";
   } catch (error) {
     console.error("Error generating company context:", error);
+    // Fallback: return web search results if OpenAI fails
+    if (webSearchResults && webSearchResults !== "Web search unavailable - using provided information only.") {
+      return `${webSearchResults}\n\nBusiness Goals: ${businessGoals}`;
+    }
     return `Basic context: ${businessName} is focused on ${businessGoals}`;
   }
 }
