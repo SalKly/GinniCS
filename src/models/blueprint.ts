@@ -102,7 +102,16 @@ export interface LegacyBlueprintData {
 }
 
 // Form step types
-export type FormStep = "business-info" | "outcomes" | "general" | "outcome-details" | "nested-outcomes" | "scorecards" | "insights" | "objections";
+export type FormStep =
+  | "business-info"
+  | "outcomes"
+  | "general"
+  | "outcome-details"
+  | "nested-outcomes"
+  | "scorecards"
+  | "visualization"
+  | "insights"
+  | "objections";
 
 export interface FormState {
   currentStep: FormStep;
