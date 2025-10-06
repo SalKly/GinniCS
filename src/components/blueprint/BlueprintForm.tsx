@@ -12,14 +12,16 @@ import { BlueprintData, FormState, FormStep, RootNode, NestedNode } from "../../
 import { validateStep, validateBlueprintData } from "../../models/blueprintValidation";
 import { BusinessInfoStep } from "./steps/BusinessInfoStep";
 import { DefineOutcomesStep } from "./steps/DefineOutcomesStep";
-import { OutcomeDetailsStep } from "./steps/OutcomeDetailsStep";
-import { GeneralTemplateStep } from "./steps/GeneralTemplateStep";
+import { ScorecardsStep } from "./steps/ScorecardsStep";
+import { VisualizationStep } from "./steps/VisualizationStep";
+import { InsightsStep } from "./steps/InsightsStep";
+import { ObjectionsStep } from "./steps/ObjectionsStep";
 import BlueprintFlow from "./BlueprintFlow";
 import { saveBlueprint } from "../../services/blueprints";
 import { createOrUpdateCompanyForm, saveFormProgress, loadFormProgress, type CompanyForm } from "../../services/companies";
 import { useRouter } from "next/router";
 
-const initialBlueprintData: BlueprintData = {
+const initialBlueprintData: any = {
   nodeName: "General Outcome",
   nodeDescription: "General criteria for all calls",
   customerInsights: [],
@@ -27,6 +29,9 @@ const initialBlueprintData: BlueprintData = {
   booleanScoreCard: [],
   variableScoreCard: [],
   nestedNodes: [],
+  scorecards: [],
+  insights: [],
+  objections: [],
   businessInfo: {
     businessName: "",
     businessGoals: "",
@@ -45,8 +50,205 @@ interface BlueprintFormProps {
 export function BlueprintForm({ mode = "create", companyName = "", existingForm = null }: BlueprintFormProps) {
   const router = useRouter();
 
+  // Helper function to transform hierarchical structure (from Supabase) to flat structure (for form)
+  const transformToFlat = (hierarchicalData: BlueprintData): any => {
+    const scorecards: any[] = [];
+    const insights: any[] = [];
+    const objections: any[] = [];
+
+    // Helper to create outcome key
+    const createOutcomeKey = (parentIdx: number, nestedIdx?: number): string => {
+      if (nestedIdx !== undefined) {
+        return `outcome-${parentIdx}-nested-${nestedIdx}`;
+      }
+      return `outcome-${parentIdx}`;
+    };
+
+    // Process root node (General Outcome) scorecards
+    if (hierarchicalData.booleanScoreCard && hierarchicalData.booleanScoreCard.length > 0) {
+      hierarchicalData.booleanScoreCard.forEach((item) => {
+        scorecards.push({
+          name: item.name,
+          description: item.description,
+          type: "boolean",
+          outcomes: ["ALL_OUTCOMES"],
+          isItFailCriteria: item.isItFailCriteria || "No",
+          failWeight: item.failWeight || "",
+        });
+      });
+    }
+
+    if (hierarchicalData.variableScoreCard && hierarchicalData.variableScoreCard.length > 0) {
+      hierarchicalData.variableScoreCard.forEach((item) => {
+        scorecards.push({
+          name: item.name,
+          description: item.description,
+          type: "variable",
+          outcomes: ["ALL_OUTCOMES"],
+          isItFailCriteria: item.isItFailCriteria || "No",
+          failWeight: item.failWeight || "",
+          score1Desc: item.score1Desc,
+          score2Desc: item.score2Desc,
+          score3Desc: item.score3Desc,
+          score4Desc: item.score4Desc,
+          score5Desc: item.score5Desc,
+          failScore: item.failScore,
+        });
+      });
+    }
+
+    // Process root node insights
+    if (hierarchicalData.customerInsights && hierarchicalData.customerInsights.length > 0) {
+      hierarchicalData.customerInsights.forEach((item) => {
+        insights.push({
+          name: item.name,
+          description: item.description,
+          outcomes: ["ALL_OUTCOMES"],
+        });
+      });
+    }
+
+    // Process root node objections
+    if (hierarchicalData.customerObjection && hierarchicalData.customerObjection.length > 0) {
+      hierarchicalData.customerObjection.forEach((item) => {
+        objections.push({
+          name: item.name,
+          description: item.description,
+          outcomes: ["ALL_OUTCOMES"],
+        });
+      });
+    }
+
+    // Process outcome-specific items
+    if (hierarchicalData.nestedNodes && hierarchicalData.nestedNodes.length > 0) {
+      hierarchicalData.nestedNodes.forEach((outcome, parentIdx) => {
+        // Process parent outcome scorecards
+        if (outcome.booleanScoreCard && outcome.booleanScoreCard.length > 0) {
+          outcome.booleanScoreCard.forEach((item) => {
+            scorecards.push({
+              name: item.name,
+              description: item.description,
+              type: "boolean",
+              outcomes: [createOutcomeKey(parentIdx)],
+              isItFailCriteria: item.isItFailCriteria || "No",
+              failWeight: item.failWeight || "",
+            });
+          });
+        }
+
+        if (outcome.variableScoreCard && outcome.variableScoreCard.length > 0) {
+          outcome.variableScoreCard.forEach((item) => {
+            scorecards.push({
+              name: item.name,
+              description: item.description,
+              type: "variable",
+              outcomes: [createOutcomeKey(parentIdx)],
+              isItFailCriteria: item.isItFailCriteria || "No",
+              failWeight: item.failWeight || "",
+              score1Desc: item.score1Desc,
+              score2Desc: item.score2Desc,
+              score3Desc: item.score3Desc,
+              score4Desc: item.score4Desc,
+              score5Desc: item.score5Desc,
+              failScore: item.failScore,
+            });
+          });
+        }
+
+        // Process parent outcome insights
+        if (outcome.customerInsights && outcome.customerInsights.length > 0) {
+          outcome.customerInsights.forEach((item) => {
+            insights.push({
+              name: item.name,
+              description: item.description,
+              outcomes: [createOutcomeKey(parentIdx)],
+            });
+          });
+        }
+
+        // Process parent outcome objections
+        if (outcome.customerObjection && outcome.customerObjection.length > 0) {
+          outcome.customerObjection.forEach((item) => {
+            objections.push({
+              name: item.name,
+              description: item.description,
+              outcomes: [createOutcomeKey(parentIdx)],
+            });
+          });
+        }
+
+        // Process nested outcomes
+        if (outcome.nestedNodes && outcome.nestedNodes.length > 0) {
+          outcome.nestedNodes.forEach((nestedOutcome, nestedIdx) => {
+            // Process nested outcome scorecards
+            if (nestedOutcome.booleanScoreCard && nestedOutcome.booleanScoreCard.length > 0) {
+              nestedOutcome.booleanScoreCard.forEach((item) => {
+                scorecards.push({
+                  name: item.name,
+                  description: item.description,
+                  type: "boolean",
+                  outcomes: [createOutcomeKey(parentIdx, nestedIdx)],
+                  isItFailCriteria: item.isItFailCriteria || "No",
+                  failWeight: item.failWeight || "",
+                });
+              });
+            }
+
+            if (nestedOutcome.variableScoreCard && nestedOutcome.variableScoreCard.length > 0) {
+              nestedOutcome.variableScoreCard.forEach((item) => {
+                scorecards.push({
+                  name: item.name,
+                  description: item.description,
+                  type: "variable",
+                  outcomes: [createOutcomeKey(parentIdx, nestedIdx)],
+                  isItFailCriteria: item.isItFailCriteria || "No",
+                  failWeight: item.failWeight || "",
+                  score1Desc: item.score1Desc,
+                  score2Desc: item.score2Desc,
+                  score3Desc: item.score3Desc,
+                  score4Desc: item.score4Desc,
+                  score5Desc: item.score5Desc,
+                  failScore: item.failScore,
+                });
+              });
+            }
+
+            // Process nested outcome insights
+            if (nestedOutcome.customerInsights && nestedOutcome.customerInsights.length > 0) {
+              nestedOutcome.customerInsights.forEach((item) => {
+                insights.push({
+                  name: item.name,
+                  description: item.description,
+                  outcomes: [createOutcomeKey(parentIdx, nestedIdx)],
+                });
+              });
+            }
+
+            // Process nested outcome objections
+            if (nestedOutcome.customerObjection && nestedOutcome.customerObjection.length > 0) {
+              nestedOutcome.customerObjection.forEach((item) => {
+                objections.push({
+                  name: item.name,
+                  description: item.description,
+                  outcomes: [createOutcomeKey(parentIdx, nestedIdx)],
+                });
+              });
+            }
+          });
+        }
+      });
+    }
+
+    return {
+      ...hierarchicalData,
+      scorecards,
+      insights,
+      objections,
+    };
+  };
+
   // Initialize form data based on mode and existing data
-  const getInitialFormData = (): BlueprintData => {
+  const getInitialFormData = (): any => {
     let data = { ...initialBlueprintData };
 
     // Set company name if provided
@@ -59,7 +261,9 @@ export function BlueprintForm({ mode = "create", companyName = "", existingForm 
 
     // Load existing form data if in edit mode
     if (mode === "edit" && existingForm) {
-      data = existingForm.form_data;
+      // Transform hierarchical data from Supabase to flat format for the form
+      const hierarchicalData = existingForm.form_data;
+      data = transformToFlat(hierarchicalData);
     }
 
     return data;
@@ -99,7 +303,8 @@ export function BlueprintForm({ mode = "create", companyName = "", existingForm 
         try {
           const existingProgress = await loadFormProgress(companyName);
           if (existingProgress) {
-            initialData = existingProgress;
+            // Transform hierarchical data from Supabase to flat format for the form
+            initialData = transformToFlat(existingProgress);
           }
         } catch (error) {
           console.error("Error loading existing progress:", error);
@@ -225,137 +430,234 @@ export function BlueprintForm({ mode = "create", companyName = "", existingForm 
     setFormState((prev) => ({ ...prev, ...updates }));
   };
 
-  const getStepNumber = (step: FormStep): number => {
+  const getStepNumber = (step: FormStep | string): number => {
     switch (step) {
       case "business-info":
         return 1;
       case "outcomes":
         return 2;
-      case "general":
+      case "scorecards":
         return 3;
-      case "outcome-details":
+      case "visualization":
         return 4;
-      case "nested-outcomes":
+      case "insights":
         return 5;
+      case "objections":
+        return 6;
       default:
         return 1;
     }
   };
 
   const getTotalSteps = (): number => {
-    const baseSteps = 3; // business-info + outcomes + general
-    const outcomeSteps = formState.blueprintData.nestedNodes.length;
-    return baseSteps + outcomeSteps;
+    return 6; // business-info + outcomes + scorecards + visualization + insights + objections
   };
 
   const getCurrentStepNumber = (): number => {
-    if (formState.currentStep === "outcome-details") {
-      return 3 + (formState.currentOutcomeIndex || 0) + 1;
-    }
     return getStepNumber(formState.currentStep);
   };
 
   const handleNext = () => {
     const currentData = getValues();
 
-    // Validate current step
-    const validation = validateStep(formState.currentStep, currentData);
-    if (!validation.success) {
-      toast.current?.show({
-        severity: "error",
-        summary: "Validation Error",
-        detail: "Please fix the errors before proceeding",
-        life: 3000,
-      });
-      return;
-    }
-
     if (formState.currentStep === "business-info") {
-      const updatedBlueprintData = {
-        ...formState.blueprintData,
-        businessInfo: currentData.businessInfo || {
-          businessName: "",
-          businessGoals: "",
-          companyWebsite: "",
-          qaManualFile: null,
-          qaManualFileName: "",
-        },
-      };
-
       updateFormState({
-        currentStep: "outcomes",
-        blueprintData: updatedBlueprintData,
+        currentStep: "outcomes" as any,
       });
     } else if (formState.currentStep === "outcomes") {
-      const updatedBlueprintData = {
-        nodeName: currentData.nodeName || "General Outcome",
-        nodeDescription: currentData.nodeDescription || "General criteria for all calls",
-        customerInsights: currentData.customerInsights || [],
-        customerObjection: currentData.customerObjection || [],
-        booleanScoreCard: currentData.booleanScoreCard || [],
-        variableScoreCard: currentData.variableScoreCard || [],
-        nestedNodes: currentData.nestedNodes || [],
-        businessInfo: formState.blueprintData.businessInfo,
-      };
-
       updateFormState({
-        currentStep: "general",
-        blueprintData: updatedBlueprintData,
+        currentStep: "scorecards" as any,
       });
-    } else if (formState.currentStep === "general") {
-      const updatedBlueprintData = {
-        ...formState.blueprintData,
-        customerInsights: currentData.customerInsights || [],
-        customerObjection: currentData.customerObjection || [],
-        booleanScoreCard: currentData.booleanScoreCard || [],
-        variableScoreCard: currentData.variableScoreCard || [],
-      };
-
+    } else if ((formState.currentStep as any) === "scorecards") {
       updateFormState({
-        currentStep: "outcome-details",
-        currentOutcomeIndex: 0,
-        blueprintData: updatedBlueprintData,
+        currentStep: "visualization" as any,
       });
-    } else if (formState.currentStep === "outcome-details") {
-      const nextOutcomeIndex = (formState.currentOutcomeIndex || 0) + 1;
-      if (nextOutcomeIndex < formState.blueprintData.nestedNodes.length) {
-        updateFormState({ currentOutcomeIndex: nextOutcomeIndex });
-      } else {
-        // All outcomes completed
-        handleComplete();
-      }
+    } else if ((formState.currentStep as any) === "visualization") {
+      updateFormState({
+        currentStep: "insights" as any,
+      });
+    } else if ((formState.currentStep as any) === "insights") {
+      updateFormState({
+        currentStep: "objections" as any,
+      });
+    } else if ((formState.currentStep as any) === "objections") {
+      // Complete the blueprint
+      handleComplete();
     }
   };
 
   const handlePrevious = () => {
     if (formState.currentStep === "outcomes") {
       updateFormState({ currentStep: "business-info" });
-    } else if (formState.currentStep === "general") {
-      updateFormState({ currentStep: "outcomes" });
-    } else if (formState.currentStep === "outcome-details") {
-      if (formState.currentOutcomeIndex === 0) {
-        updateFormState({ currentStep: "general" });
-      } else {
-        const prevIndex = (formState.currentOutcomeIndex || 0) - 1;
-        updateFormState({ currentOutcomeIndex: prevIndex });
-      }
+    } else if ((formState.currentStep as any) === "scorecards") {
+      updateFormState({ currentStep: "outcomes" as any });
+    } else if ((formState.currentStep as any) === "visualization") {
+      updateFormState({ currentStep: "scorecards" as any });
+    } else if ((formState.currentStep as any) === "insights") {
+      updateFormState({ currentStep: "visualization" as any });
+    } else if ((formState.currentStep as any) === "objections") {
+      updateFormState({ currentStep: "insights" as any });
     }
+  };
+
+  // Helper function to transform flat structure to hierarchical
+  const transformToHierarchical = (formData: any): BlueprintData => {
+    const scorecards = formData.scorecards || [];
+    const insights = formData.insights || [];
+    const objections = formData.objections || [];
+    const outcomes = formData.nestedNodes || [];
+
+    // Initialize root node (General Outcome) arrays
+    const rootBooleanScoreCards: any[] = [];
+    const rootVariableScoreCards: any[] = [];
+    const rootInsights: any[] = [];
+    const rootObjections: any[] = [];
+
+    // Initialize outcome nodes with empty arrays
+    const processedOutcomes = JSON.parse(JSON.stringify(outcomes));
+
+    // Helper to get all outcome indices that should receive an item
+    const getTargetIndices = (selectedOutcomes: string[]): { isRoot: boolean; indices: number[][] } => {
+      if (selectedOutcomes.includes("ALL_OUTCOMES")) {
+        return { isRoot: true, indices: [] };
+      }
+
+      const indices: number[][] = [];
+      selectedOutcomes.forEach((outcomeKey) => {
+        const match = outcomeKey.match(/^outcome-(\d+)(?:-nested-(\d+))?$/);
+        if (match) {
+          const parentIndex = parseInt(match[1]);
+          const nestedIndex = match[2] ? parseInt(match[2]) : null;
+
+          if (nestedIndex !== null) {
+            // Specific nested outcome
+            indices.push([parentIndex, nestedIndex]);
+          } else {
+            // Parent outcome - applies to parent AND all nested
+            indices.push([parentIndex]);
+            // Add all nested outcomes too
+            const parent = outcomes[parentIndex];
+            if (parent?.nestedNodes) {
+              parent.nestedNodes.forEach((_: any, nIdx: number) => {
+                indices.push([parentIndex, nIdx]);
+              });
+            }
+          }
+        }
+      });
+
+      return { isRoot: false, indices };
+    };
+
+    // Helper to add item to outcome node
+    const addToOutcome = (indices: number[][], item: any, arrayName: string) => {
+      indices.forEach((idx) => {
+        if (idx.length === 1) {
+          // Main outcome
+          const [parentIdx] = idx;
+          if (!processedOutcomes[parentIdx][arrayName]) {
+            processedOutcomes[parentIdx][arrayName] = [];
+          }
+          processedOutcomes[parentIdx][arrayName].push(item);
+        } else if (idx.length === 2) {
+          // Nested outcome
+          const [parentIdx, nestedIdx] = idx;
+          if (!processedOutcomes[parentIdx].nestedNodes[nestedIdx][arrayName]) {
+            processedOutcomes[parentIdx].nestedNodes[nestedIdx][arrayName] = [];
+          }
+          processedOutcomes[parentIdx].nestedNodes[nestedIdx][arrayName].push(item);
+        }
+      });
+    };
+
+    // Process scorecards
+    scorecards.forEach((scorecard: any) => {
+      const { isRoot, indices } = getTargetIndices(scorecard.outcomes || []);
+
+      if (scorecard.type === "boolean") {
+        const item = {
+          name: scorecard.name,
+          description: scorecard.description,
+          isItFailCriteria: scorecard.isItFailCriteria || "No",
+          ...(scorecard.isItFailCriteria === "Yes" && { failWeight: scorecard.failWeight }),
+        };
+
+        if (isRoot) {
+          rootBooleanScoreCards.push(item);
+        } else {
+          addToOutcome(indices, item, "booleanScoreCard");
+        }
+      } else {
+        const item = {
+          name: scorecard.name,
+          description: scorecard.description,
+          isItFailCriteria: scorecard.isItFailCriteria || "No",
+          score1Desc: scorecard.score1Desc,
+          score2Desc: scorecard.score2Desc,
+          score3Desc: scorecard.score3Desc,
+          score4Desc: scorecard.score4Desc,
+          score5Desc: scorecard.score5Desc,
+          ...(scorecard.isItFailCriteria === "Yes" && {
+            failWeight: scorecard.failWeight,
+            failScore: scorecard.failScore,
+          }),
+        };
+
+        if (isRoot) {
+          rootVariableScoreCards.push(item);
+        } else {
+          addToOutcome(indices, item, "variableScoreCard");
+        }
+      }
+    });
+
+    // Process insights
+    insights.forEach((insight: any) => {
+      const { isRoot, indices } = getTargetIndices(insight.outcomes || []);
+      const item = {
+        name: insight.name,
+        description: insight.description,
+      };
+
+      if (isRoot) {
+        rootInsights.push(item);
+      } else {
+        addToOutcome(indices, item, "customerInsights");
+      }
+    });
+
+    // Process objections
+    objections.forEach((objection: any) => {
+      const { isRoot, indices } = getTargetIndices(objection.outcomes || []);
+      const item = {
+        name: objection.name,
+        description: objection.description,
+      };
+
+      if (isRoot) {
+        rootObjections.push(item);
+      } else {
+        addToOutcome(indices, item, "customerObjection");
+      }
+    });
+
+    return {
+      nodeName: "General Outcome",
+      nodeDescription: "General criteria for all calls",
+      customerInsights: rootInsights,
+      customerObjection: rootObjections,
+      booleanScoreCard: rootBooleanScoreCards,
+      variableScoreCard: rootVariableScoreCards,
+      nestedNodes: processedOutcomes,
+      businessInfo: formData.businessInfo,
+    };
   };
 
   const handleComplete = async () => {
     const formData = getValues();
 
-    // Create the final flattened structure
-    const finalData: BlueprintData = {
-      nodeName: formData.nodeName || "General Outcome",
-      nodeDescription: formData.nodeDescription || "General criteria for all calls",
-      customerInsights: formData.customerInsights || [],
-      customerObjection: formData.customerObjection || [],
-      booleanScoreCard: formData.booleanScoreCard || [],
-      variableScoreCard: formData.variableScoreCard || [],
-      nestedNodes: formData.nestedNodes || [],
-      businessInfo: formData.businessInfo,
-    };
+    // Transform the data structure
+    const finalData: BlueprintData = transformToHierarchical(formData);
 
     // Final validation
     const validation = validateBlueprintData(finalData);
@@ -474,9 +776,9 @@ export function BlueprintForm({ mode = "create", companyName = "", existingForm 
             setValue={setValue}
           />
         );
-      case "general":
+      case "scorecards":
         return (
-          <GeneralTemplateStep
+          <ScorecardsStep
             formState={formState}
             onUpdateFormState={updateFormState}
             onNext={handleNext}
@@ -485,15 +787,27 @@ export function BlueprintForm({ mode = "create", companyName = "", existingForm 
             control={control}
           />
         );
-      case "outcome-details":
+      case "visualization":
+        return <VisualizationStep control={control} formData={transformToHierarchical(getValues())} />;
+      case "insights":
         return (
-          <OutcomeDetailsStep
+          <InsightsStep
             formState={formState}
             onUpdateFormState={updateFormState}
             onNext={handleNext}
             onPrevious={handlePrevious}
             onComplete={handleComplete}
-            outcomeIndex={formState.currentOutcomeIndex || 0}
+            control={control}
+          />
+        );
+      case "objections":
+        return (
+          <ObjectionsStep
+            formState={formState}
+            onUpdateFormState={updateFormState}
+            onNext={handleNext}
+            onPrevious={handlePrevious}
+            onComplete={handleComplete}
             control={control}
           />
         );
@@ -545,16 +859,21 @@ export function BlueprintForm({ mode = "create", companyName = "", existingForm 
                           ? "fa-building"
                           : formState.currentStep === "outcomes"
                           ? "fa-list-check"
-                          : formState.currentStep === "general"
-                          ? "fa-sliders"
-                          : "fa-tasks"
+                          : (formState.currentStep as any) === "scorecards"
+                          ? "fa-clipboard-check"
+                          : (formState.currentStep as any) === "visualization"
+                          ? "fa-project-diagram"
+                          : (formState.currentStep as any) === "insights"
+                          ? "fa-eye"
+                          : "fa-exclamation-triangle"
                       } text-purple-700`}
                     ></i>
                     {formState.currentStep === "business-info" && "Provide your business information"}
                     {formState.currentStep === "outcomes" && "Define your call outcomes"}
-                    {formState.currentStep === "general" && "Configure General Outcome template"}
-                    {formState.currentStep === "outcome-details" &&
-                      `Configure "${formState.blueprintData.nestedNodes[formState.currentOutcomeIndex || 0]?.nodeName}" outcome`}
+                    {(formState.currentStep as any) === "scorecards" && "Configure scorecards"}
+                    {(formState.currentStep as any) === "visualization" && "Visualize your blueprint tree"}
+                    {(formState.currentStep as any) === "insights" && "Configure customer insights"}
+                    {(formState.currentStep as any) === "objections" && "Configure customer objections"}
                   </p>
                 </div>
               </div>
@@ -568,10 +887,12 @@ export function BlueprintForm({ mode = "create", companyName = "", existingForm 
             <div className="relative">
               <ProgressBar value={progressValue} className="h-3 rounded-full overflow-hidden" showValue={false} />
               <div className="absolute -bottom-6 left-0 right-0 flex justify-between text-xs text-gray-500 px-1">
-                <span>Business Info</span>
+                <span>Business</span>
                 <span>Outcomes</span>
-                <span>General Template</span>
-                <span>Details</span>
+                <span>Scorecards</span>
+                <span>Visualize</span>
+                <span>Insights</span>
+                <span>Objections</span>
               </div>
             </div>
           </div>
@@ -633,11 +954,8 @@ export function BlueprintForm({ mode = "create", companyName = "", existingForm 
                 )}
 
                 <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                  {formState.currentStep === "outcome-details" &&
-                  (formState.currentOutcomeIndex || 0) === formState.blueprintData.nestedNodes.length - 1 ? (
-                    <>
-                      <Button type="submit" label="Complete Blueprint" icon="fas fa-check" className="p-button-success w-full sm:w-auto" />
-                    </>
+                  {(formState.currentStep as any) === "objections" ? (
+                    <Button type="submit" label="Complete Blueprint" icon="fas fa-check" className="p-button-success w-full sm:w-auto" />
                   ) : (
                     <Button type="submit" label="Next Step" icon="fas fa-arrow-right" iconPos="right" className="w-full sm:w-auto" />
                   )}

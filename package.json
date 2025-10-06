@@ -21,6 +21,7 @@
     "@xyflow/react": "^12.8.6",
     "multer": "^2.0.2",
     "next": "15.5.4",
+    "next-intl": "^4.3.9",
     "openai": "^5.23.2",
     "pdfjs-dist": "^5.4.149",
     "postcss": "^8.5.6",

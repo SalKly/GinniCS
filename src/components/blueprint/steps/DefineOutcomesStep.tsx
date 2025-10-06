@@ -115,7 +115,7 @@ export function DefineOutcomesStep({ formState, onUpdateFormState, onNext, onPre
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Define Call Outcomes</h2>
         <p className="text-gray-600">
-          Configure the General Outcome (always present) and add specific call outcomes. Each outcome will get its own detailed configuration page.
+          Add specific call outcomes that can occur. You can also add nested outcomes within each outcome to create more specific scenarios.
         </p>
       </div>
 
@@ -127,44 +127,11 @@ export function DefineOutcomesStep({ formState, onUpdateFormState, onNext, onPre
           <div>
             <h4 className="font-semibold text-purple-900 mb-2">What are Call Outcomes?</h4>
             <p className="text-purple-800">
-              The General Outcome contains criteria that apply to all calls. Specific outcomes are the different results that can happen at the end of
-              a sales call. Examples include "Demo Scheduled", "Not Interested", "Needs Follow-up", etc. Each outcome will have its own set of
-              evaluation criteria and coaching guidelines. You can also add nested outcomes within each outcome to create more specific scenarios.
+              Call outcomes are the different results that can happen at the end of a sales call. Examples include "Demo Scheduled", "Not Interested",
+              "Needs Follow-up", etc. You can also add nested outcomes within each outcome to create more specific scenarios. In the next steps,
+              you'll configure evaluation criteria that can apply to all outcomes or specific outcomes.
             </p>
           </div>
-        </div>
-      </div>
-
-      {/* General Outcome Section - Always Present */}
-      <div className="blueprint-card border-l-4 border-l-green-500">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-6 h-6 bg-green-600 text-white rounded-full flex items-center justify-center text-xs font-semibold">
-              <i className="fas fa-star text-xs"></i>
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900">General Outcome</h3>
-            <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">Always Present</span>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <InputTextField
-            control={control}
-            field="nodeName"
-            label="General Outcome Name"
-            placeholder="General criteria for all calls"
-            isRequired
-            toolTip="This outcome applies to every call and cannot be removed"
-          />
-
-          <TextAreaField
-            control={control}
-            field="nodeDescription"
-            label="Description"
-            placeholder="Describe the general criteria that apply to all sales calls"
-            rows={3}
-            toolTip="This description will help AI understand the baseline criteria for all calls"
-          />
         </div>
       </div>
 
@@ -339,13 +306,13 @@ export function DefineOutcomesStep({ formState, onUpdateFormState, onNext, onPre
       <div className="warning-box">
         <div className="flex items-start gap-4">
           <div className="text-warning-600 mt-1">
-            <i className="fas fa-exclamation-triangle"></i>
+            <i className="fas fa-lightbulb"></i>
           </div>
           <div>
             <h4 className="font-semibold text-warning-900 mb-2">Next Steps</h4>
             <p className="text-warning-800">
-              After defining your outcomes, you'll configure the General Outcome template, then configure specific details for each outcome
-              individually.
+              After defining your outcomes, you'll configure scorecards, insights, and objections. Each can be assigned to all outcomes or specific
+              outcomes.
             </p>
           </div>
         </div>
