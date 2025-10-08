@@ -16,7 +16,7 @@ const PRIMARY_COLOR = "rgb(84, 22, 123)";
 interface ViewLinkData {
   token: string;
   password: string;
-  companyName: string;
+  company_name: string;
 }
 
 export default function ClientViewPage() {
