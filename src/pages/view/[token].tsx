@@ -125,7 +125,9 @@ export default function ClientViewPage() {
           {/* Logo/Header */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center mb-4 p-6 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-2xl shadow-xl">
-              <Image src="/GA_Logo_On-purple.png" alt="Ginni Logo" width={100} height={100} />
+              <div className="relative w-24 h-24">
+                <Image src="/GA_Logo_On-purple.png" alt="Ginni Logo" fill className="object-contain" />
+              </div>
             </div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Blueprint Access</h1>
             <p className="text-gray-600">Enter your password to view the blueprint</p>
@@ -141,7 +143,7 @@ export default function ClientViewPage() {
                 </label>
                 <input
                   id="password"
-                  type="text"
+                  type="password"
                   value={passwordInput}
                   onChange={(e) => setPasswordInput(e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent text-center text-lg font-bold tracking-widest"
@@ -224,7 +226,9 @@ export default function ClientViewPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 sm:gap-4">
               <div className="p-1.5 sm:p-2 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-lg shadow-md flex-shrink-0">
-                <Image src="/GA_Logo_On-purple.png" alt="Ginni Logo" width={32} height={32} className="sm:w-10 sm:h-10" />
+                <div className="relative w-8 h-8 sm:w-10 sm:h-10">
+                  <Image src="/GA_Logo_On-purple.png" alt="Ginni Logo" fill className="object-contain" />
+                </div>
               </div>
               <div>
                 <h1 className="text-lg sm:text-2xl lg:text-3xl font-bold text-gray-900 leading-tight">
