@@ -218,62 +218,62 @@ export default function ClientViewPage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <Tooltip id="info-tooltip" />
 
-      {/* Header */}
+      {/* Header - Responsive */}
       <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="p-2 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-lg shadow-md">
-                <Image src="/GA_Logo_On-purple.png" alt="Ginni Logo" width={40} height={40} />
+            <div className="flex items-center gap-2 sm:gap-4">
+              <div className="p-1.5 sm:p-2 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-lg shadow-md flex-shrink-0">
+                <Image src="/GA_Logo_On-purple.png" alt="Ginni Logo" width={32} height={32} className="sm:w-10 sm:h-10" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">
+                <h1 className="text-lg sm:text-2xl lg:text-3xl font-bold text-gray-900 leading-tight">
                   Ginni X <span style={{ color: PRIMARY_COLOR }}>{viewLinkData?.company_name || blueprintData?.businessInfo?.businessName}</span>
                 </h1>
-                <p className="text-sm text-gray-600 mt-1">Professional Call Scoring Blueprint</p>
+                <p className="text-xs sm:text-sm text-gray-600 mt-0.5 sm:mt-1">Professional Call Scoring Blueprint</p>
               </div>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
-        {/* Introduction Section */}
-        <section className="bg-white rounded-2xl shadow-lg p-8 border border-gray-200">
+      {/* Content - Responsive */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12 space-y-6 sm:space-y-8 lg:space-y-12">
+        {/* Introduction Section - Responsive */}
+        <section className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8 border border-gray-200">
           <div className="prose max-w-none">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
               <i className="fas fa-handshake" style={{ color: PRIMARY_COLOR }}></i>
               About This Blueprint
             </h2>
-            <p className="text-gray-700 leading-relaxed text-lg">
+            <p className="text-sm sm:text-base lg:text-lg text-gray-700 leading-relaxed">
               Building an effective scorecard is a <strong>collaborative effort</strong> between Ginni and your team. Our goal is to provide you with
               the <strong>highest quality</strong> call evaluation system that truly reflects your business objectives and customer interactions.
             </p>
-            <p className="text-gray-600 mt-4">
+            <p className="text-sm sm:text-base text-gray-600 mt-3 sm:mt-4">
               This blueprint contains comprehensive guidelines for evaluating calls across different outcomes, with detailed scorecards, customer
               insights, and common objections to help your team succeed.
             </p>
           </div>
         </section>
 
-        {/* Understanding the Blueprint - Explanatory Section */}
-        <section className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl shadow-lg p-8 border border-purple-200">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        {/* Understanding the Blueprint - Explanatory Section - Responsive */}
+        <section className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8 border border-purple-200">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 flex items-center gap-2">
             <i className="fas fa-book-open" style={{ color: PRIMARY_COLOR }}></i>
             Understanding the Blueprint Components
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             {/* Call Outcomes */}
-            <div className="bg-white rounded-xl p-6 border border-purple-200">
-              <div className="flex items-start gap-3 mb-3">
-                <div className="w-12 h-12 bg-purple-600 text-white rounded-lg flex items-center justify-center flex-shrink-0">
-                  <i className="fas fa-sitemap text-xl"></i>
+            <div className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 border border-purple-200">
+              <div className="flex items-start gap-2 sm:gap-3 mb-2 sm:mb-3">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-600 text-white rounded-lg flex items-center justify-center flex-shrink-0">
+                  <i className="fas fa-sitemap text-lg sm:text-xl"></i>
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 text-lg">Call Outcomes</h3>
-                  <p className="text-sm text-gray-600 mt-1 leading-relaxed">
+                  <h3 className="font-bold text-gray-900 text-base sm:text-lg">Call Outcomes</h3>
+                  <p className="text-xs sm:text-sm text-gray-600 mt-1 leading-relaxed">
                     Different paths or results that can occur during customer interactions. Each outcome represents a specific scenario (e.g., "Sale
                     Made", "Follow-up Required") and has its own set of evaluation criteria.
                   </p>
@@ -363,9 +363,9 @@ export default function ClientViewPage() {
           </div>
         </section>
 
-        {/* Call Outcomes Section */}
-        <section className="bg-white rounded-2xl shadow-lg p-8 border border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        {/* Call Outcomes Section - Responsive */}
+        <section className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8 border border-gray-200">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 flex items-center gap-2">
             <i className="fas fa-sitemap" style={{ color: PRIMARY_COLOR }}></i>
             Call Outcomes
             <i
@@ -381,9 +381,9 @@ export default function ClientViewPage() {
           <CallOutcomesList blueprintData={blueprintData} />
         </section>
 
-        {/* Scorecards Section */}
-        <section className="bg-white rounded-2xl shadow-lg p-8 border border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        {/* Scorecards Section - Responsive */}
+        <section className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8 border border-gray-200">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 flex items-center gap-2">
             <i className="fas fa-clipboard-check" style={{ color: PRIMARY_COLOR }}></i>
             Scorecards
             <i
@@ -392,23 +392,23 @@ export default function ClientViewPage() {
               data-tooltip-content="Scorecards are used to evaluate call quality. Playbook checks are yes/no criteria, while Skills are rated on a 1-5 scale."
             ></i>
           </h2>
-          <p className="text-gray-600 mb-8">
+          <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">
             These scorecards help evaluate call performance systematically. They are organized by sections for better clarity and understanding.
           </p>
           <ScorecardsSection blueprintData={blueprintData} />
         </section>
 
-        {/* View Flowchart Button */}
-        <section className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl shadow-lg p-8 border-2 border-purple-200">
+        {/* View Flowchart Button - Responsive */}
+        <section className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl sm:rounded-2xl shadow-lg p-6 sm:p-8 border-2 border-purple-200">
           <div className="text-center">
-            <i className="fas fa-project-diagram text-5xl mb-4" style={{ color: PRIMARY_COLOR }}></i>
-            <h2 className="text-2xl font-bold text-gray-900 mb-3">Interactive Flowchart</h2>
-            <p className="text-gray-700 mb-6 max-w-2xl mx-auto">
+            <i className="fas fa-project-diagram text-4xl sm:text-5xl mb-3 sm:mb-4" style={{ color: PRIMARY_COLOR }}></i>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 sm:mb-3">Interactive Flowchart</h2>
+            <p className="text-sm sm:text-base text-gray-700 mb-4 sm:mb-6 max-w-2xl mx-auto px-4">
               Visualize the complete blueprint structure as an interactive tree diagram. See how all outcomes and scorecards are connected.
             </p>
             <button
               onClick={() => setShowFlowchart(true)}
-              className="px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 text-lg"
+              className="px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-lg sm:rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 text-base sm:text-lg"
             >
               <i className="fas fa-eye mr-2"></i>
               View Flowchart
@@ -416,10 +416,10 @@ export default function ClientViewPage() {
           </div>
         </section>
 
-        {/* Customer Insights Section */}
+        {/* Customer Insights Section - Responsive */}
         {blueprintData.customerInsights && blueprintData.customerInsights.length > 0 && (
-          <section className="bg-white rounded-2xl shadow-lg p-8 border border-gray-200">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+          <section className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8 border border-gray-200">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 flex items-center gap-2">
               <i className="fas fa-lightbulb" style={{ color: PRIMARY_COLOR }}></i>
               Customer Insights
               <i
@@ -435,10 +435,10 @@ export default function ClientViewPage() {
           </section>
         )}
 
-        {/* Objections Section */}
+        {/* Objections Section - Responsive */}
         {blueprintData.customerObjection && blueprintData.customerObjection.length > 0 && (
-          <section className="bg-white rounded-2xl shadow-lg p-8 border border-gray-200">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+          <section className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8 border border-gray-200">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 flex items-center gap-2">
               <i className="fas fa-exclamation-triangle text-amber-600"></i>
               Common Objections
               <i
@@ -454,8 +454,8 @@ export default function ClientViewPage() {
           </section>
         )}
 
-        {/* Footer */}
-        <footer className="text-center py-8 text-gray-500 text-sm">
+        {/* Footer - Responsive */}
+        <footer className="text-center py-6 sm:py-8 text-gray-500 text-xs sm:text-sm">
           <p>© {new Date().getFullYear()} Ginni. All rights reserved.</p>
           <p className="mt-2">This is a secure, read-only view of your blueprint.</p>
         </footer>
@@ -499,14 +499,19 @@ function CallOutcomesList({ blueprintData }: { blueprintData: BlueprintData }) {
   collectOutcomes(blueprintData, true);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {allOutcomes.map((outcome, index) => (
-        <div key={index} className="border border-gray-200 rounded-xl p-5 hover:border-purple-300 transition-all">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
-            <span className="w-8 h-8 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center text-sm font-bold">{index + 1}</span>
+        <div key={index} className="border border-gray-200 rounded-lg sm:rounded-xl p-4 sm:p-5 hover:border-purple-300 transition-all">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
+            <span className="w-7 h-7 sm:w-8 sm:h-8 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold flex-shrink-0">
+              {index + 1}
+            </span>
             {outcome.name}
           </h3>
-          <div className="text-gray-600 leading-relaxed ml-10" dangerouslySetInnerHTML={{ __html: outcome.description }} />
+          <div
+            className="text-sm sm:text-base text-gray-600 leading-relaxed ml-9 sm:ml-10"
+            dangerouslySetInnerHTML={{ __html: outcome.description }}
+          />
         </div>
       ))}
     </div>
@@ -596,7 +601,7 @@ function ScorecardsSection({ blueprintData }: { blueprintData: BlueprintData }) 
   });
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {sections.length > 0 ? (
         sections.map((section) => {
           const scorecards = scorecardsBySection[section.id];
@@ -605,16 +610,16 @@ function ScorecardsSection({ blueprintData }: { blueprintData: BlueprintData }) 
           }
 
           return (
-            <div key={section.id} className="border-2 border-purple-200 rounded-xl overflow-hidden">
-              <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-4">
-                <h3 className="text-xl font-bold">{section.name}</h3>
-                {section.description && <p className="text-purple-100 text-sm mt-1">{section.description}</p>}
+            <div key={section.id} className="border-2 border-purple-200 rounded-lg sm:rounded-xl overflow-hidden">
+              <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-3 sm:p-4">
+                <h3 className="text-lg sm:text-xl font-bold">{section.name}</h3>
+                {section.description && <p className="text-purple-100 text-xs sm:text-sm mt-1">{section.description}</p>}
               </div>
-              <div className="p-6 bg-white space-y-6">
+              <div className="p-4 sm:p-6 bg-white space-y-4 sm:space-y-6">
                 {/* Boolean Scorecards */}
                 {scorecards.boolean.length > 0 && (
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <h4 className="text-sm sm:text-base font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
                       <i className="fas fa-check-circle text-blue-600"></i>
                       Playbook Checks (Yes/No)
                     </h4>
@@ -629,7 +634,7 @@ function ScorecardsSection({ blueprintData }: { blueprintData: BlueprintData }) 
                 {/* Variable Scorecards */}
                 {scorecards.variable.length > 0 && (
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <h4 className="text-sm sm:text-base font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
                       <i className="fas fa-star text-amber-500"></i>
                       Skills (Score 1-5)
                     </h4>
@@ -646,7 +651,7 @@ function ScorecardsSection({ blueprintData }: { blueprintData: BlueprintData }) 
         })
       ) : (
         // Show unsorted scorecards if no sections
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {scorecardsBySection["unsorted"] && (
             <>
               {scorecardsBySection["unsorted"].boolean.length > 0 && (
@@ -691,23 +696,23 @@ function ScorecardCard({ scorecard, outcomes, type }: { scorecard: any; outcomes
     <div className="border border-gray-200 rounded-lg overflow-hidden hover:border-purple-300 transition-all">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full p-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
+        className="w-full p-3 sm:p-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
       >
-        <div className="flex items-center gap-3 flex-1">
+        <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
           <div
-            className={`w-10 h-10 rounded-full flex items-center justify-center ${
+            className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
               type === "boolean" ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"
             }`}
           >
-            <i className={type === "boolean" ? "fas fa-check" : "fas fa-star"}></i>
+            <i className={`${type === "boolean" ? "fas fa-check" : "fas fa-star"} text-sm sm:text-base`}></i>
           </div>
-          <div className="flex-1">
-            <h5 className="font-semibold text-gray-900 mb-1">{scorecard.name}</h5>
+          <div className="flex-1 min-w-0">
+            <h5 className="text-sm sm:text-base font-semibold text-gray-900 mb-1">{scorecard.name}</h5>
             {/* Show outcome names in collapsed view */}
             {outcomes.length > 0 && (
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5 sm:gap-2">
                 {outcomes.map((outcome, idx) => (
-                  <span key={idx} className="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded font-medium">
+                  <span key={idx} className="text-[10px] sm:text-xs bg-indigo-100 text-indigo-700 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded font-medium">
                     {outcome}
                   </span>
                 ))}
@@ -715,16 +720,16 @@ function ScorecardCard({ scorecard, outcomes, type }: { scorecard: any; outcomes
             )}
           </div>
         </div>
-        <i className={`fas fa-chevron-${isExpanded ? "up" : "down"} text-gray-400`}></i>
+        <i className={`fas fa-chevron-${isExpanded ? "up" : "down"} text-gray-400 text-sm sm:text-base flex-shrink-0 ml-2`}></i>
       </button>
 
       {isExpanded && (
-        <div className="p-4 bg-gray-50 border-t border-gray-200 space-y-4">
+        <div className="p-3 sm:p-4 bg-gray-50 border-t border-gray-200 space-y-3 sm:space-y-4">
           {/* Call Phases - only shown when expanded */}
           {scorecard.callPhases && scorecard.callPhases.length > 0 && (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5 sm:gap-2">
               {scorecard.callPhases.map((phase: string, idx: number) => (
-                <span key={`phase-${idx}`} className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded font-medium">
+                <span key={`phase-${idx}`} className="text-[10px] sm:text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded font-medium">
                   {phase}
                 </span>
               ))}
@@ -732,18 +737,18 @@ function ScorecardCard({ scorecard, outcomes, type }: { scorecard: any; outcomes
           )}
 
           {/* Description without label */}
-          <div className="text-gray-600" dangerouslySetInnerHTML={{ __html: scorecard.description }} />
+          <div className="text-sm sm:text-base text-gray-600" dangerouslySetInnerHTML={{ __html: scorecard.description }} />
 
           {type === "variable" && (
             <div>
-              <p className="text-sm font-semibold text-gray-700 mb-2">Score Guide</p>
-              <div className="space-y-2">
+              <p className="text-xs sm:text-sm font-semibold text-gray-700 mb-2">Score Guide</p>
+              <div className="space-y-1.5 sm:space-y-2">
                 {[1, 2, 3, 4, 5].map((num) => (
-                  <div key={num} className="flex items-start gap-2">
-                    <span className="w-6 h-6 bg-purple-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">
+                  <div key={num} className="flex items-start gap-1.5 sm:gap-2">
+                    <span className="w-5 h-5 sm:w-6 sm:h-6 bg-purple-600 text-white rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold flex-shrink-0">
                       {num}
                     </span>
-                    <p className="text-sm text-gray-600 flex-1">
+                    <p className="text-xs sm:text-sm text-gray-600 flex-1">
                       <span dangerouslySetInnerHTML={{ __html: scorecard[`score${num}Desc`] || "—" }} />
                     </p>
                   </div>
@@ -759,16 +764,16 @@ function ScorecardCard({ scorecard, outcomes, type }: { scorecard: any; outcomes
 
 function InsightsList({ insights }: { insights: Array<{ name: string; description: string }> }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
       {insights.map((insight, index) => (
-        <div key={index} className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6">
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center flex-shrink-0">
-              <i className="fas fa-lightbulb"></i>
+        <div key={index} className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-lg sm:rounded-xl p-4 sm:p-6">
+          <div className="flex items-start gap-2 sm:gap-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-600 text-white rounded-full flex items-center justify-center flex-shrink-0">
+              <i className="fas fa-lightbulb text-sm sm:text-base"></i>
             </div>
-            <div className="flex-1">
-              <h4 className="font-semibold text-gray-900 mb-2">{insight.name}</h4>
-              <div className="text-gray-700 text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: insight.description }} />
+            <div className="flex-1 min-w-0">
+              <h4 className="text-sm sm:text-base font-semibold text-gray-900 mb-1.5 sm:mb-2">{insight.name}</h4>
+              <div className="text-xs sm:text-sm text-gray-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: insight.description }} />
             </div>
           </div>
         </div>
@@ -779,16 +784,16 @@ function InsightsList({ insights }: { insights: Array<{ name: string; descriptio
 
 function ObjectionsList({ objections }: { objections: Array<{ name: string; description: string }> }) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {objections.map((objection, index) => (
-        <div key={index} className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-6">
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 bg-amber-600 text-white rounded-full flex items-center justify-center flex-shrink-0">
-              <i className="fas fa-exclamation-triangle"></i>
+        <div key={index} className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-lg sm:rounded-xl p-4 sm:p-6">
+          <div className="flex items-start gap-2 sm:gap-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-amber-600 text-white rounded-full flex items-center justify-center flex-shrink-0">
+              <i className="fas fa-exclamation-triangle text-sm sm:text-base"></i>
             </div>
-            <div className="flex-1">
-              <h4 className="font-semibold text-gray-900 mb-2">{objection.name}</h4>
-              <div className="text-gray-700 text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: objection.description }} />
+            <div className="flex-1 min-w-0">
+              <h4 className="text-sm sm:text-base font-semibold text-gray-900 mb-1.5 sm:mb-2">{objection.name}</h4>
+              <div className="text-xs sm:text-sm text-gray-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: objection.description }} />
             </div>
           </div>
         </div>
