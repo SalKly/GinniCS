@@ -480,6 +480,41 @@ export default function ClientViewPage() {
           </div>
         </div>
       )}
+
+      {/* Global styles for HTML content */}
+      <style jsx global>{`
+        .prose ul {
+          list-style-type: disc !important;
+          padding-left: 1.5rem !important;
+          margin-top: 0.5rem !important;
+          margin-bottom: 0.5rem !important;
+        }
+        .prose ol {
+          list-style-type: decimal !important;
+          padding-left: 1.5rem !important;
+          margin-top: 0.5rem !important;
+          margin-bottom: 0.5rem !important;
+        }
+        .prose li {
+          display: list-item !important;
+          margin-top: 0.25rem !important;
+          margin-bottom: 0.25rem !important;
+        }
+        .prose ul li::marker {
+          color: #6b7280 !important;
+        }
+        .prose ol li::marker {
+          color: #6b7280 !important;
+        }
+        .prose strong {
+          font-weight: 600 !important;
+          color: #111827 !important;
+        }
+        .prose p {
+          margin-top: 0.5rem !important;
+          margin-bottom: 0.5rem !important;
+        }
+      `}</style>
     </div>
   );
 }
@@ -513,7 +548,12 @@ function CallOutcomesList({ blueprintData }: { blueprintData: BlueprintData }) {
             {outcome.name}
           </h3>
           <div
-            className="text-sm sm:text-base text-gray-600 leading-relaxed ml-9 sm:ml-10"
+            className="text-sm sm:text-base text-gray-600 leading-relaxed ml-9 sm:ml-10 prose prose-sm sm:prose max-w-none
+              prose-ul:list-disc prose-ul:ml-4 prose-ul:pl-2 prose-ul:space-y-1
+              prose-ol:list-decimal prose-ol:ml-4 prose-ol:pl-2 prose-ol:space-y-1
+              prose-li:text-gray-600
+              prose-strong:text-gray-900 prose-strong:font-semibold
+              prose-p:my-2"
             dangerouslySetInnerHTML={{ __html: outcome.description }}
           />
         </div>
@@ -525,17 +565,24 @@ function CallOutcomesList({ blueprintData }: { blueprintData: BlueprintData }) {
 function ScorecardsSection({ blueprintData }: { blueprintData: BlueprintData }) {
   const sections = blueprintData.scorecardSections || [];
 
-  // Collect all scorecards grouped by section, with their related call outcomes
+  // Collect all scorecards grouped by section, with their related call outcomes and descriptions
   const scorecardsBySection: Record<
     string,
     {
-      boolean: Array<{ scorecard: any; outcomes: string[] }>;
-      variable: Array<{ scorecard: any; outcomes: string[] }>;
+      boolean: Array<{ scorecard: any; outcomeDetails: Array<{ outcome: string; description: string }> }>;
+      variable: Array<{ scorecard: any; outcomeDetails: Array<{ outcome: string; description: string }> }>;
     }
   > = {};
 
-  // Map to track unique scorecards and their outcomes
-  const scorecardMap = new Map<string, { scorecard: any; outcomes: Set<string>; type: "boolean" | "variable" }>();
+  // Map to track unique scorecards and their outcome-specific details
+  const scorecardMap = new Map<
+    string,
+    {
+      scorecard: any;
+      outcomeDetails: Map<string, string>; // outcome name -> description
+      type: "boolean" | "variable";
+    }
+  >();
 
   const collectScorecards = (node: any, outcomeName?: string) => {
     const currentOutcome = outcomeName || node.nodeName || "Root";
@@ -545,13 +592,15 @@ function ScorecardsSection({ blueprintData }: { blueprintData: BlueprintData }) 
       node.booleanScoreCard.forEach((sc: any) => {
         const key = `boolean_${sc.name}`;
         if (!scorecardMap.has(key)) {
+          const outcomeDetails = new Map<string, string>();
+          outcomeDetails.set(currentOutcome, sc.description);
           scorecardMap.set(key, {
             scorecard: sc,
-            outcomes: new Set([currentOutcome]),
+            outcomeDetails,
             type: "boolean",
           });
         } else {
-          scorecardMap.get(key)!.outcomes.add(currentOutcome);
+          scorecardMap.get(key)!.outcomeDetails.set(currentOutcome, sc.description);
         }
       });
     }
@@ -561,13 +610,15 @@ function ScorecardsSection({ blueprintData }: { blueprintData: BlueprintData }) 
       node.variableScoreCard.forEach((sc: any) => {
         const key = `variable_${sc.name}`;
         if (!scorecardMap.has(key)) {
+          const outcomeDetails = new Map<string, string>();
+          outcomeDetails.set(currentOutcome, sc.description);
           scorecardMap.set(key, {
             scorecard: sc,
-            outcomes: new Set([currentOutcome]),
+            outcomeDetails,
             type: "variable",
           });
         } else {
-          scorecardMap.get(key)!.outcomes.add(currentOutcome);
+          scorecardMap.get(key)!.outcomeDetails.set(currentOutcome, sc.description);
         }
       });
     }
@@ -582,24 +633,27 @@ function ScorecardsSection({ blueprintData }: { blueprintData: BlueprintData }) 
 
   // Organize scorecards by section
   scorecardMap.forEach((value, key) => {
-    const { scorecard, outcomes, type } = value;
+    const { scorecard, outcomeDetails, type } = value;
     const sectionId = scorecard.sectionId || "unsorted";
 
     if (!scorecardsBySection[sectionId]) {
       scorecardsBySection[sectionId] = { boolean: [], variable: [] };
     }
 
-    const outcomesArray = Array.from(outcomes).filter((o) => o !== "Root");
+    // Convert Map to Array and filter out "Root"
+    const outcomeDetailsArray = Array.from(outcomeDetails.entries())
+      .filter(([outcome]) => outcome !== "Root")
+      .map(([outcome, description]) => ({ outcome, description }));
 
     if (type === "boolean") {
       scorecardsBySection[sectionId].boolean.push({
         scorecard,
-        outcomes: outcomesArray,
+        outcomeDetails: outcomeDetailsArray,
       });
     } else {
       scorecardsBySection[sectionId].variable.push({
         scorecard,
-        outcomes: outcomesArray,
+        outcomeDetails: outcomeDetailsArray,
       });
     }
   });
@@ -619,72 +673,34 @@ function ScorecardsSection({ blueprintData }: { blueprintData: BlueprintData }) 
                 <h3 className="text-lg sm:text-xl font-bold">{section.name}</h3>
                 {section.description && <p className="text-purple-100 text-xs sm:text-sm mt-1">{section.description}</p>}
               </div>
-              <div className="p-4 sm:p-6 bg-white space-y-4 sm:space-y-6">
-                {/* Boolean Scorecards */}
-                {scorecards.boolean.length > 0 && (
-                  <div>
-                    <h4 className="text-sm sm:text-base font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
-                      <i className="fas fa-check-circle text-blue-600"></i>
-                      Playbook Checks (Yes/No)
-                    </h4>
-                    <div className="space-y-3">
-                      {scorecards.boolean.map((item, idx) => (
-                        <ScorecardCard key={idx} scorecard={item.scorecard} outcomes={item.outcomes} type="boolean" />
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Variable Scorecards */}
-                {scorecards.variable.length > 0 && (
-                  <div>
-                    <h4 className="text-sm sm:text-base font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
-                      <i className="fas fa-star text-amber-500"></i>
-                      Skills (Score 1-5)
-                    </h4>
-                    <div className="space-y-3">
-                      {scorecards.variable.map((item, idx) => (
-                        <ScorecardCard key={idx} scorecard={item.scorecard} outcomes={item.outcomes} type="variable" />
-                      ))}
-                    </div>
-                  </div>
-                )}
+              <div className="p-4 sm:p-6 bg-white">
+                {/* Combined Scorecards List */}
+                <div className="space-y-3">
+                  {/* Boolean Scorecards */}
+                  {scorecards.boolean.map((item, idx) => (
+                    <ScorecardCard key={`bool-${idx}`} scorecard={item.scorecard} outcomeDetails={item.outcomeDetails} type="boolean" />
+                  ))}
+                  {/* Variable Scorecards */}
+                  {scorecards.variable.map((item, idx) => (
+                    <ScorecardCard key={`var-${idx}`} scorecard={item.scorecard} outcomeDetails={item.outcomeDetails} type="variable" />
+                  ))}
+                </div>
               </div>
             </div>
           );
         })
       ) : (
         // Show unsorted scorecards if no sections
-        <div className="space-y-4 sm:space-y-6">
+        <div className="space-y-3">
           {scorecardsBySection["unsorted"] && (
             <>
-              {scorecardsBySection["unsorted"].boolean.length > 0 && (
-                <div>
-                  <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                    <i className="fas fa-check-circle text-blue-600"></i>
-                    Playbook Checks (Yes/No)
-                  </h4>
-                  <div className="space-y-3">
-                    {scorecardsBySection["unsorted"].boolean.map((item, idx) => (
-                      <ScorecardCard key={idx} scorecard={item.scorecard} outcomes={item.outcomes} type="boolean" />
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {scorecardsBySection["unsorted"].variable.length > 0 && (
-                <div>
-                  <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                    <i className="fas fa-star text-amber-500"></i>
-                    Skills (Score 1-5)
-                  </h4>
-                  <div className="space-y-3">
-                    {scorecardsBySection["unsorted"].variable.map((item, idx) => (
-                      <ScorecardCard key={idx} scorecard={item.scorecard} outcomes={item.outcomes} type="variable" />
-                    ))}
-                  </div>
-                </div>
-              )}
+              {/* Combined list of all scorecards */}
+              {scorecardsBySection["unsorted"].boolean.map((item, idx) => (
+                <ScorecardCard key={`bool-${idx}`} scorecard={item.scorecard} outcomeDetails={item.outcomeDetails} type="boolean" />
+              ))}
+              {scorecardsBySection["unsorted"].variable.map((item, idx) => (
+                <ScorecardCard key={`var-${idx}`} scorecard={item.scorecard} outcomeDetails={item.outcomeDetails} type="variable" />
+              ))}
             </>
           )}
         </div>
@@ -693,8 +709,17 @@ function ScorecardsSection({ blueprintData }: { blueprintData: BlueprintData }) 
   );
 }
 
-function ScorecardCard({ scorecard, outcomes, type }: { scorecard: any; outcomes: string[]; type: "boolean" | "variable" }) {
+function ScorecardCard({
+  scorecard,
+  outcomeDetails,
+  type,
+}: {
+  scorecard: any;
+  outcomeDetails: Array<{ outcome: string; description: string }>;
+  type: "boolean" | "variable";
+}) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const outcomes = outcomeDetails.map((od) => od.outcome);
 
   return (
     <div className="border border-gray-200 rounded-lg overflow-hidden hover:border-purple-300 transition-all">
@@ -711,7 +736,17 @@ function ScorecardCard({ scorecard, outcomes, type }: { scorecard: any; outcomes
             <i className={`${type === "boolean" ? "fas fa-check" : "fas fa-star"} text-sm sm:text-base`}></i>
           </div>
           <div className="flex-1 min-w-0">
-            <h5 className="text-sm sm:text-base font-semibold text-gray-900 mb-1">{scorecard.name}</h5>
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <h5 className="text-sm sm:text-base font-semibold text-gray-900">{scorecard.name}</h5>
+              {/* Type badge */}
+              <span
+                className={`text-[10px] sm:text-xs px-2 py-0.5 sm:py-1 rounded-full font-bold ${
+                  type === "boolean" ? "bg-blue-600 text-white" : "bg-green-600 text-white"
+                }`}
+              >
+                {type === "boolean" ? "Yes/No" : "Scored"}
+              </span>
+            </div>
             {/* Show outcome names in collapsed view */}
             {outcomes.length > 0 && (
               <div className="flex flex-wrap gap-1.5 sm:gap-2">
@@ -729,19 +764,30 @@ function ScorecardCard({ scorecard, outcomes, type }: { scorecard: any; outcomes
 
       {isExpanded && (
         <div className="p-3 sm:p-4 bg-gray-50 border-t border-gray-200 space-y-3 sm:space-y-4">
-          {/* Call Phases - only shown when expanded */}
-          {scorecard.callPhases && scorecard.callPhases.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 sm:gap-2">
-              {scorecard.callPhases.map((phase: string, idx: number) => (
-                <span key={`phase-${idx}`} className="text-[10px] sm:text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded font-medium">
-                  {phase}
-                </span>
+          {/* Descriptions by Outcome */}
+          {outcomeDetails.length > 0 && (
+            <div className="space-y-4">
+              {outcomeDetails.map((detail, idx) => (
+                <div key={idx} className="bg-white border-l-4 border-indigo-600 rounded-r-lg p-3 sm:p-4 shadow-sm">
+                  <div className="mb-2 sm:mb-3">
+                    <h6 className="text-sm sm:text-base font-bold text-indigo-900 uppercase tracking-wide flex items-center gap-2">
+                      <i className="fas fa-arrow-right text-indigo-600"></i>
+                      {detail.outcome}
+                    </h6>
+                  </div>
+                  <div
+                    className="text-sm sm:text-base text-gray-700 leading-relaxed prose prose-sm sm:prose max-w-none
+                      prose-ul:list-disc prose-ul:ml-4 prose-ul:pl-2 prose-ul:space-y-1
+                      prose-ol:list-decimal prose-ol:ml-4 prose-ol:pl-2 prose-ol:space-y-1
+                      prose-li:text-gray-700
+                      prose-strong:text-gray-900 prose-strong:font-semibold
+                      prose-p:my-2"
+                    dangerouslySetInnerHTML={{ __html: detail.description }}
+                  />
+                </div>
               ))}
             </div>
           )}
-
-          {/* Description without label */}
-          <div className="text-sm sm:text-base text-gray-600" dangerouslySetInnerHTML={{ __html: scorecard.description }} />
 
           {type === "variable" && (
             <div>
@@ -752,9 +798,15 @@ function ScorecardCard({ scorecard, outcomes, type }: { scorecard: any; outcomes
                     <span className="w-5 h-5 sm:w-6 sm:h-6 bg-purple-600 text-white rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold flex-shrink-0">
                       {num}
                     </span>
-                    <p className="text-xs sm:text-sm text-gray-600 flex-1">
-                      <span dangerouslySetInnerHTML={{ __html: scorecard[`score${num}Desc`] || "—" }} />
-                    </p>
+                    <div
+                      className="text-xs sm:text-sm text-gray-600 flex-1 prose prose-sm max-w-none
+                        prose-ul:list-disc prose-ul:ml-3 prose-ul:pl-1 prose-ul:space-y-0.5
+                        prose-ol:list-decimal prose-ol:ml-3 prose-ol:pl-1 prose-ol:space-y-0.5
+                        prose-li:text-gray-600 prose-li:text-xs prose-li:sm:text-sm
+                        prose-strong:text-gray-900 prose-strong:font-semibold
+                        prose-p:my-0.5"
+                      dangerouslySetInnerHTML={{ __html: scorecard[`score${num}Desc`] || "—" }}
+                    />
                   </div>
                 ))}
               </div>
@@ -777,7 +829,15 @@ function InsightsList({ insights }: { insights: Array<{ name: string; descriptio
             </div>
             <div className="flex-1 min-w-0">
               <h4 className="text-sm sm:text-base font-semibold text-gray-900 mb-1.5 sm:mb-2">{insight.name}</h4>
-              <div className="text-xs sm:text-sm text-gray-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: insight.description }} />
+              <div
+                className="text-xs sm:text-sm text-gray-700 leading-relaxed prose prose-sm max-w-none
+                  prose-ul:list-disc prose-ul:ml-4 prose-ul:pl-2 prose-ul:space-y-1
+                  prose-ol:list-decimal prose-ol:ml-4 prose-ol:pl-2 prose-ol:space-y-1
+                  prose-li:text-gray-700
+                  prose-strong:text-gray-900 prose-strong:font-semibold
+                  prose-p:my-1"
+                dangerouslySetInnerHTML={{ __html: insight.description }}
+              />
             </div>
           </div>
         </div>
@@ -797,7 +857,15 @@ function ObjectionsList({ objections }: { objections: Array<{ name: string; desc
             </div>
             <div className="flex-1 min-w-0">
               <h4 className="text-sm sm:text-base font-semibold text-gray-900 mb-1.5 sm:mb-2">{objection.name}</h4>
-              <div className="text-xs sm:text-sm text-gray-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: objection.description }} />
+              <div
+                className="text-xs sm:text-sm text-gray-700 leading-relaxed prose prose-sm max-w-none
+                  prose-ul:list-disc prose-ul:ml-4 prose-ul:pl-2 prose-ul:space-y-1
+                  prose-ol:list-decimal prose-ol:ml-4 prose-ol:pl-2 prose-ol:space-y-1
+                  prose-li:text-gray-700
+                  prose-strong:text-gray-900 prose-strong:font-semibold
+                  prose-p:my-1"
+                dangerouslySetInnerHTML={{ __html: objection.description }}
+              />
             </div>
           </div>
         </div>

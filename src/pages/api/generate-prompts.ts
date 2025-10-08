@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import OpenAI from "openai";
 import { searchCompanyInfo } from "../../services/perplexitySearch";
+import { stripHtmlServer } from "../../utils/htmlStripServer";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || "",
@@ -185,7 +186,7 @@ function generateGlobalTranscriptPrompt(allOutcomes: any[], companyContext: stri
       return `
 ## ${outcome.nodeName}
 Path: ${outcome.path.join(" → ")}
-Description: ${outcome.nodeDescription}
+Description: ${stripHtmlServer(outcome.nodeDescription)}
 
 What to listen for in this type of call:
 ${outcome.customerInsights.length > 0 ? `- Customer Insights: ${outcome.customerInsights.map((i: any) => i.name).join(", ")}` : ""}
@@ -252,13 +253,13 @@ function generateCallInsightsPrompts(outcome: any): PromptItem[] {
   const prompts: PromptItem[] = [];
 
   for (const insight of outcome.customerInsights) {
-    const prompt = `CALL OUTCOME: ${outcome.nodeName} - ${outcome.nodeDescription}
+    const prompt = `CALL OUTCOME: ${outcome.nodeName} - ${stripHtmlServer(outcome.nodeDescription)}
 
 You are analyzing a call transcript to extract a specific customer insight.
 
 INSIGHT TO EXTRACT:
 Name: ${insight.name}
-Description: ${insight.description}
+Description: ${stripHtmlServer(insight.description)}
 
 INSTRUCTIONS:
 Read the transcript and identify if this insight appears in the conversation.
@@ -297,13 +298,13 @@ function generateCallObjectionsPrompts(outcome: any): PromptItem[] {
   const prompts: PromptItem[] = [];
 
   for (const objection of outcome.customerObjection) {
-    const prompt = `CALL OUTCOME: ${outcome.nodeName} - ${outcome.nodeDescription}
+    const prompt = `CALL OUTCOME: ${outcome.nodeName} - ${stripHtmlServer(outcome.nodeDescription)}
 
 You are analyzing a call transcript to identify a specific customer objection.
 
 OBJECTION TO DETECT:
 Name: ${objection.name}
-Description: ${objection.description}
+Description: ${stripHtmlServer(objection.description)}
 
 INSTRUCTIONS:
 Read the transcript and determine if this objection was raised (explicitly or implied).
@@ -345,13 +346,13 @@ function generatePlaybookChecksPrompts(outcome: any): PromptItem[] {
   const prompts: PromptItem[] = [];
 
   for (const check of outcome.booleanScoreCard) {
-    const prompt = `CALL OUTCOME: ${outcome.nodeName} - ${outcome.nodeDescription}
+    const prompt = `CALL OUTCOME: ${outcome.nodeName} - ${stripHtmlServer(outcome.nodeDescription)}
 
 You are evaluating a call transcript against a specific playbook requirement.
 
 PLAYBOOK CHECK:
 Name: ${check.name}
-Description: ${check.description}
+Description: ${stripHtmlServer(check.description)}
 
 INSTRUCTIONS:
 Read the transcript and determine if this requirement was met.
@@ -389,20 +390,20 @@ function generateVariableScorecardPrompts(outcome: any): PromptItem[] {
   const prompts: PromptItem[] = [];
 
   for (const item of outcome.variableScoreCard) {
-    const prompt = `CALL OUTCOME: ${outcome.nodeName} - ${outcome.nodeDescription}
+    const prompt = `CALL OUTCOME: ${outcome.nodeName} - ${stripHtmlServer(outcome.nodeDescription)}
 
 You are scoring a call transcript on a specific performance metric.
 
 METRIC TO SCORE:
 Name: ${item.name}
-Description: ${item.description}
+Description: ${stripHtmlServer(item.description)}
 
 SCORING SCALE (1-5):
-1 = ${item.score1Desc || "Poor"}
-2 = ${item.score2Desc || "Below Average"}
-3 = ${item.score3Desc || "Average"}
-4 = ${item.score4Desc || "Good"}
-5 = ${item.score5Desc || "Excellent"}
+1 = ${stripHtmlServer(item.score1Desc || "Poor")}
+2 = ${stripHtmlServer(item.score2Desc || "Below Average")}
+3 = ${stripHtmlServer(item.score3Desc || "Average")}
+4 = ${stripHtmlServer(item.score4Desc || "Good")}
+5 = ${stripHtmlServer(item.score5Desc || "Excellent")}
 
 INSTRUCTIONS:
 Read the transcript and score this metric based on the scale above.

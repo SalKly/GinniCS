@@ -1,4 +1,5 @@
 import { BlueprintData, NestedNode, InsightItem, ObjectionItem, YesNoScorecardItem, VariableScorecardItem } from "../models/blueprint";
+import { stripHtml } from "./htmlStrip";
 
 /**
  * Interface for a flattened outcome (leaf node with inherited attributes)
@@ -70,13 +71,25 @@ function collectLeafNodes(
     return [
       {
         nodeName: node.nodeName,
-        nodeDescription: node.nodeDescription,
+        nodeDescription: stripHtml(node.nodeDescription),
         isScored: node.isScored !== false, // Default to true if not specified
         path: currentPath,
-        customerInsights: mergedInsights,
-        customerObjection: mergedObjections,
-        booleanScoreCard: mergedBooleanScoreCard,
-        variableScoreCard: mergedVariableScoreCard,
+        customerInsights: mergedInsights.map((insight) => ({
+          ...insight,
+          description: stripHtml(insight.description),
+        })),
+        customerObjection: mergedObjections.map((objection) => ({
+          ...objection,
+          description: stripHtml(objection.description),
+        })),
+        booleanScoreCard: mergedBooleanScoreCard.map((card) => ({
+          ...card,
+          description: stripHtml(card.description),
+        })),
+        variableScoreCard: mergedVariableScoreCard.map((card) => ({
+          ...card,
+          description: stripHtml(card.description),
+        })),
       },
     ];
   }
@@ -108,13 +121,25 @@ export function flattenBlueprintToCallOutcomes(blueprintData: BlueprintData): Fl
   if (!blueprintData.nestedNodes || blueprintData.nestedNodes.length === 0) {
     callOutcomes.push({
       nodeName: blueprintData.nodeName || "Root Outcome",
-      nodeDescription: blueprintData.nodeDescription || "",
+      nodeDescription: stripHtml(blueprintData.nodeDescription || ""),
       isScored: blueprintData.isScored !== false, // Default to true if not specified
       path: [blueprintData.nodeName || "Root Outcome"],
-      customerInsights: rootInsights,
-      customerObjection: rootObjections,
-      booleanScoreCard: rootBooleanScoreCard,
-      variableScoreCard: rootVariableScoreCard,
+      customerInsights: rootInsights.map((insight) => ({
+        ...insight,
+        description: stripHtml(insight.description),
+      })),
+      customerObjection: rootObjections.map((objection) => ({
+        ...objection,
+        description: stripHtml(objection.description),
+      })),
+      booleanScoreCard: rootBooleanScoreCard.map((card) => ({
+        ...card,
+        description: stripHtml(card.description),
+      })),
+      variableScoreCard: rootVariableScoreCard.map((card) => ({
+        ...card,
+        description: stripHtml(card.description),
+      })),
     });
   } else {
     // Process each top-level nested node

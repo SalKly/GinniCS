@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { BlueprintForm } from "../../components/blueprint/BlueprintForm";
+import { EditorPasswordProtection } from "../../components/common/EditorPasswordProtection";
 
 export default function NewFormPage() {
   const router = useRouter();
@@ -13,5 +14,9 @@ export default function NewFormPage() {
     }
   }, [router.query]);
 
-  return <BlueprintForm mode="create" companyName={companyName} />;
+  return (
+    <EditorPasswordProtection>
+      <BlueprintForm mode="create" companyName={companyName} />
+    </EditorPasswordProtection>
+  );
 }
