@@ -13,6 +13,7 @@ export function EditorPasswordProtection({ children }: EditorPasswordProtectionP
   const [passwordInput, setPasswordInput] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Check if already authenticated on mount
   useEffect(() => {
@@ -23,9 +24,13 @@ export function EditorPasswordProtection({ children }: EditorPasswordProtectionP
     setIsLoading(false);
   }, []);
 
-  const handlePasswordSubmit = (e: React.FormEvent) => {
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setIsSubmitting(true);
+
+    // Simulate authentication check delay for better UX
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     if (passwordInput.trim() === CORRECT_PASSWORD) {
       localStorage.setItem(STORAGE_KEY, CORRECT_PASSWORD);
@@ -34,6 +39,8 @@ export function EditorPasswordProtection({ children }: EditorPasswordProtectionP
       setError("Incorrect password. Please try again.");
       setPasswordInput("");
     }
+    
+    setIsSubmitting(false);
   };
 
   // Loading state
@@ -93,11 +100,21 @@ export function EditorPasswordProtection({ children }: EditorPasswordProtectionP
 
               <button
                 type="submit"
-                className="w-full py-3 px-6 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
+                disabled={isSubmitting}
+                className="w-full py-3 px-6 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 <span className="flex items-center justify-center gap-2">
-                  <i className="fas fa-lock-open"></i>
-                  Access Editor
+                  {isSubmitting ? (
+                    <>
+                      <i className="fas fa-spinner fa-spin"></i>
+                      Verifying...
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-lock-open"></i>
+                      Access Editor
+                    </>
+                  )}
                 </span>
               </button>
             </form>

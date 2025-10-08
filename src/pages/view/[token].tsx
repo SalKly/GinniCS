@@ -108,11 +108,13 @@ export default function ClientViewPage() {
         await loadData();
       } else {
         setError("Incorrect password. Please try again.");
+        setPasswordInput("");
         setIsLoading(false);
       }
     } catch (err) {
       console.error("Authentication error:", err);
       setError("Authentication failed. Please try again.");
+      setPasswordInput("");
       setIsLoading(false);
     }
   };
