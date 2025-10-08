@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import { Control, Controller, useFieldArray, useWatch } from "react-hook-form";
+import { Control, useFieldArray, useWatch } from "react-hook-form";
 import { Button } from "primereact/button";
 import { Card } from "primereact/card";
 import { InputTextField } from "../../form/InputTextField";
 import { TextAreaField } from "../../form/TextAreaField";
-import { OutcomeSelector } from "../../form/OutcomeSelector";
 import { StepProps, BlueprintData } from "../../../models/blueprint";
 
 interface InsightsStepProps extends StepProps {
@@ -14,7 +13,6 @@ interface InsightsStepProps extends StepProps {
 interface InsightWithOutcomes {
   name: string;
   description: string;
-  outcomes: string[];
 }
 
 export function InsightsStep({ formState, onUpdateFormState, onNext, onPrevious, onComplete, control }: InsightsStepProps) {
@@ -30,16 +28,11 @@ export function InsightsStep({ formState, onUpdateFormState, onNext, onPrevious,
     name: "insights",
   }) as InsightWithOutcomes[] | undefined;
 
-  const outcomes = useWatch({
-    control,
-    name: "nestedNodes",
-  });
-
   const addInsight = () => {
     append({
       name: "",
       description: "",
-      outcomes: ["ALL_OUTCOMES"],
+      outcomes: ["ALL_OUTCOMES"], // Always apply to all outcomes
     });
     // Expand the new card
     const newIndex = fields.length;
@@ -82,7 +75,7 @@ export function InsightsStep({ formState, onUpdateFormState, onNext, onPrevious,
             <h4 className="font-semibold text-purple-900 mb-2">About Customer Insights</h4>
             <p className="text-purple-800">
               Customer insights are key pieces of information that should be gathered or observed during sales calls. These help your team understand
-              customer needs, preferences, pain points, and decision-making factors. You can assign each insight to all outcomes or specific ones.
+              customer needs, preferences, pain points, and decision-making factors.
             </p>
           </div>
         </div>
@@ -122,13 +115,6 @@ export function InsightsStep({ formState, onUpdateFormState, onNext, onPrevious,
                     </div>
                     <div>
                       <h4 className="font-semibold text-gray-900">{insight?.name || `Insight ${index + 1}`}</h4>
-                      <div className="flex items-center gap-2 text-xs text-gray-600 mt-1">
-                        {insight?.outcomes?.includes("ALL_OUTCOMES") ? (
-                          <span className="px-2 py-0.5 bg-purple-100 text-purple-800 rounded-full">All Outcomes</span>
-                        ) : (
-                          <span className="px-2 py-0.5 bg-gray-100 text-gray-800 rounded-full">{insight?.outcomes?.length || 0} outcome(s)</span>
-                        )}
-                      </div>
                     </div>
                   </div>
                   <Button
@@ -166,30 +152,6 @@ export function InsightsStep({ formState, onUpdateFormState, onNext, onPrevious,
                         rows={4}
                         isRequired
                         toolTip="Explain what this insight represents and why it's important"
-                      />
-                    </div>
-
-                    {/* Configuration Section */}
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <h5 className="text-sm font-semibold text-gray-900 flex items-center gap-2 mb-4">
-                        <i className="fas fa-cog text-purple-600"></i>
-                        Apply to Outcomes
-                      </h5>
-                      {/* Outcome Selector */}
-                      <Controller
-                        name={`insights.${index}.outcomes`}
-                        control={control}
-                        defaultValue={["ALL_OUTCOMES"]}
-                        render={({ field }) => (
-                          <OutcomeSelector
-                            outcomes={outcomes || []}
-                            selectedOutcomes={field.value || ["ALL_OUTCOMES"]}
-                            onChange={field.onChange}
-                            label="Select Call Outcomes"
-                            placeholder="Select outcomes or 'All Outcomes'"
-                            tooltip="Choose which outcomes this insight applies to"
-                          />
-                        )}
                       />
                     </div>
                   </div>

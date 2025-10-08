@@ -39,7 +39,10 @@ export function ItemListField({ control, fieldName, title, description, icon, co
             <p className="text-sm text-gray-600">{description}</p>
           </div>
         </div>
-        <Button type="button" label="Add Item" icon="fas fa-plus" className="p-button-sm p-button-outlined" onClick={addItem} />
+        <Button type="button" className="p-button-sm p-button-outlined" onClick={addItem}>
+          <i className="fas fa-plus mr-2"></i>
+          Add Item
+        </Button>
       </div>
 
       <div className="space-y-4">
@@ -52,11 +55,12 @@ export function ItemListField({ control, fieldName, title, description, icon, co
               </div>
               <Button
                 type="button"
-                icon="fas fa-trash"
                 className="p-button-danger p-button-outlined p-button-sm"
                 onClick={() => removeItem(index)}
                 tooltip="Remove this item"
-              />
+              >
+                <i className="fas fa-trash"></i>
+              </Button>
             </div>
 
             <div className="space-y-4">

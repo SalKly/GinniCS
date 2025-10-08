@@ -203,13 +203,9 @@ export function BusinessInfoStep({ formState, onUpdateFormState, onNext, onPrevi
                     <p className="text-sm text-green-700">{(uploadedFile.size / 1024 / 1024).toFixed(2)} MB</p>
                   </div>
                 </div>
-                <Button
-                  type="button"
-                  icon="fas fa-trash"
-                  className="p-button-danger p-button-outlined p-button-sm"
-                  onClick={removeFile}
-                  tooltip="Remove file"
-                />
+                <Button type="button" className="p-button-danger p-button-outlined p-button-sm" onClick={removeFile} tooltip="Remove file">
+                  <i className="fas fa-trash"></i>
+                </Button>
               </div>
             )}
 

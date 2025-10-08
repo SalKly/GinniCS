@@ -9,7 +9,11 @@ interface BlueprintRow {
 
 function sanitizeBlueprint(blueprint: BlueprintData): BlueprintData {
   const safeBusinessInfo = blueprint.businessInfo ? { ...blueprint.businessInfo, qaManualFile: null } : undefined;
-  return { ...blueprint, businessInfo: safeBusinessInfo };
+  return {
+    ...blueprint,
+    businessInfo: safeBusinessInfo,
+    scorecardSections: blueprint.scorecardSections || [], // Explicitly preserve scorecard sections
+  };
 }
 
 export async function saveBlueprint(blueprint: BlueprintData): Promise<string> {

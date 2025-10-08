@@ -6,6 +6,7 @@ import { BlueprintData, NestedNode, InsightItem, ObjectionItem, YesNoScorecardIt
 export interface FlattenedOutcome {
   nodeName: string;
   nodeDescription: string;
+  isScored?: boolean; // Indicates if this outcome should be scored
   path: string[]; // Path from root to this leaf (e.g., ["Root", "Parent1", "Parent2", "Leaf"])
   customerInsights: InsightItem[];
   customerObjection: ObjectionItem[];
@@ -70,6 +71,7 @@ function collectLeafNodes(
       {
         nodeName: node.nodeName,
         nodeDescription: node.nodeDescription,
+        isScored: node.isScored !== false, // Default to true if not specified
         path: currentPath,
         customerInsights: mergedInsights,
         customerObjection: mergedObjections,
@@ -107,6 +109,7 @@ export function flattenBlueprintToCallOutcomes(blueprintData: BlueprintData): Fl
     callOutcomes.push({
       nodeName: blueprintData.nodeName || "Root Outcome",
       nodeDescription: blueprintData.nodeDescription || "",
+      isScored: blueprintData.isScored !== false, // Default to true if not specified
       path: [blueprintData.nodeName || "Root Outcome"],
       customerInsights: rootInsights,
       customerObjection: rootObjections,

@@ -61,6 +61,19 @@ CREATE TRIGGER update_forms_updated_at
 -- CREATE POLICY "Enable update access for all users" ON forms FOR UPDATE USING (true);
 -- CREATE POLICY "Enable delete access for all users" ON forms FOR DELETE USING (true);
 
+-- Create view_links table for client-facing view-only links
+CREATE TABLE IF NOT EXISTS view_links (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    token VARCHAR(64) NOT NULL UNIQUE,
+    password VARCHAR(32) NOT NULL,
+    company_name VARCHAR(255) NOT NULL REFERENCES companies(name) ON DELETE CASCADE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create indexes for view_links
+CREATE INDEX IF NOT EXISTS idx_view_links_token ON view_links(token);
+CREATE INDEX IF NOT EXISTS idx_view_links_company_name ON view_links(company_name);
+
 -- Insert some sample data (optional)
 -- INSERT INTO companies (name, website) VALUES 
 --   ('Sample Company', 'https://example.com'),

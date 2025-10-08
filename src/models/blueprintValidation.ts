@@ -5,25 +5,16 @@ export const failureImpactSchema = z.enum(["IMMEDIATE", "WITH_1", "WITH_2", "WIT
 
 export const failCriteriaSchema = z.enum(["Yes", "No"]);
 
-export const yesNoScorecardItemSchema = z
-  .object({
-    name: z.string().min(1, "Question is required"),
-    description: z.string().min(1, "Description is required"),
-    isItFailCriteria: failCriteriaSchema,
-    failWeight: z.string().optional(),
-  })
-  .refine(
-    (data) => {
-      if (data.isItFailCriteria === "Yes") {
-        return data.failWeight && data.failWeight.length > 0;
-      }
-      return true;
-    },
-    {
-      message: "Fail weight is required when isItFailCriteria is Yes",
-      path: ["failWeight"],
-    }
-  );
+export const scorecardSectionSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Section name is required"),
+  description: z.string().optional(),
+});
+
+export const yesNoScorecardItemSchema = z.object({
+  name: z.string().min(1, "Question is required"),
+  description: z.string().min(1, "Description is required"),
+});
 
 export const insightItemSchema = z.object({
   name: z.string().min(1, "Insight name is required"),
@@ -35,36 +26,21 @@ export const objectionItemSchema = z.object({
   description: z.string().min(1, "Objection description is required"),
 });
 
-export const variableScorecardItemSchema = z
-  .object({
-    name: z.string().min(1, "Question is required"),
-    description: z.string().min(1, "Description is required"),
-    isItFailCriteria: failCriteriaSchema,
-    failWeight: z.string().optional(),
-    score1Desc: z.string().min(1, "Score 1 description is required"),
-    score2Desc: z.string().min(1, "Score 2 description is required"),
-    score3Desc: z.string().min(1, "Score 3 description is required"),
-    score4Desc: z.string().min(1, "Score 4 description is required"),
-    score5Desc: z.string().min(1, "Score 5 description is required"),
-    failScore: z.number().min(1).max(5).optional(),
-  })
-  .refine(
-    (data) => {
-      if (data.isItFailCriteria === "Yes") {
-        return data.failWeight && data.failWeight.length > 0 && data.failScore !== undefined;
-      }
-      return true;
-    },
-    {
-      message: "Fail weight and fail score are required when isItFailCriteria is Yes",
-      path: ["failWeight"],
-    }
-  );
+export const variableScorecardItemSchema = z.object({
+  name: z.string().min(1, "Question is required"),
+  description: z.string().min(1, "Description is required"),
+  score1Desc: z.string().min(1, "Score 1 description is required"),
+  score2Desc: z.string().min(1, "Score 2 description is required"),
+  score3Desc: z.string().min(1, "Score 3 description is required"),
+  score4Desc: z.string().min(1, "Score 4 description is required"),
+  score5Desc: z.string().min(1, "Score 5 description is required"),
+});
 
 // Node schema for the new structure
 export const nodeSchema = z.object({
   nodeName: z.string().min(1, "Node name is required"),
   nodeDescription: z.string().min(1, "Node description is required"),
+  isScored: z.boolean().optional(),
   customerInsights: z.array(insightItemSchema),
   customerObjection: z.array(objectionItemSchema),
   booleanScoreCard: z.array(yesNoScorecardItemSchema),
@@ -76,6 +52,7 @@ export const nestedNodeSchema: z.ZodType<any> = z.lazy(() =>
   z.object({
     nodeName: z.string().min(1, "Node name is required"),
     nodeDescription: z.string().min(1, "Node description is required"),
+    isScored: z.boolean().optional(),
     customerInsights: z.array(insightItemSchema),
     customerObjection: z.array(objectionItemSchema),
     booleanScoreCard: z.array(yesNoScorecardItemSchema),
@@ -96,6 +73,7 @@ export const businessInfoSchema = z.object({
 export const blueprintDataSchema = nodeSchema.extend({
   nestedNodes: z.array(nestedNodeSchema),
   businessInfo: businessInfoSchema.optional(),
+  scorecardSections: z.array(scorecardSectionSchema).optional(),
 });
 
 // Legacy schemas for backward compatibility

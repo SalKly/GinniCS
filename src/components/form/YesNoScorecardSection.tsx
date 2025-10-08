@@ -72,8 +72,8 @@ export function YesNoScorecardSection({ control, fieldName }: YesNoScorecardSect
             <i className="fas fa-check-circle text-lg"></i>
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">Yes/No Scorecard</h3>
-            <p className="text-sm text-gray-600">Binary evaluation criteria (Yes/No questions) for call assessment</p>
+            <h3 className="text-lg font-semibold text-gray-900">Playbook Checks (Yes/No)</h3>
+            <p className="text-sm text-gray-600">Binary evaluation criteria with yes/no answers for call assessment</p>
           </div>
         </div>
         <Button type="button" label="Add Item" icon="fas fa-plus" className="p-button-sm p-button-outlined" onClick={addItem} />
@@ -134,7 +134,7 @@ export function YesNoScorecardSection({ control, fieldName }: YesNoScorecardSect
       {fields.length === 0 && (
         <div className="text-center py-8 text-gray-500">
           <i className="fas fa-inbox text-3xl mb-3 block"></i>
-          <p className="text-sm">No Yes/No items added yet. Click "Add Item" to create evaluation criteria.</p>
+          <p className="text-sm">No playbook checks added yet. Click "Add Item" to create yes/no evaluation criteria.</p>
         </div>
       )}
     </div>

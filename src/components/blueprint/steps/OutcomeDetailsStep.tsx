@@ -1,5 +1,6 @@
 import React from "react";
-import { Control } from "react-hook-form";
+import { Control, Controller } from "react-hook-form";
+import { Checkbox } from "primereact/checkbox";
 import { InputTextField } from "../../form/InputTextField";
 import { TextAreaField } from "../../form/TextAreaField";
 import { ItemListField } from "../../form/ItemListField";
@@ -55,6 +56,28 @@ export function OutcomeDetailsStep({ formState, onUpdateFormState, onNext, onPre
             rows={4}
             toolTip="Provide context about this outcome for better AI understanding"
           />
+
+          {/* isScored Checkbox */}
+          <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+            <Controller
+              name={`nestedNodes.${outcomeIndex}.isScored`}
+              control={control}
+              defaultValue={true}
+              render={({ field }) => (
+                <div className="flex items-center gap-3">
+                  <Checkbox
+                    inputId={`isScored-outcome-${outcomeIndex}`}
+                    checked={field.value !== false}
+                    onChange={(e) => field.onChange(e.checked)}
+                  />
+                  <label htmlFor={`isScored-outcome-${outcomeIndex}`} className="cursor-pointer">
+                    <span className="font-medium text-gray-900">Include in Scoring</span>
+                    <p className="text-sm text-gray-600 mt-1">Uncheck if this outcome should be excluded from scoring (e.g., "No Shows")</p>
+                  </label>
+                </div>
+              )}
+            />
+          </div>
         </div>
       </div>
 

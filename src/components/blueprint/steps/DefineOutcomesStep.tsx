@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Control, useFieldArray, useWatch, UseFormSetValue } from "react-hook-form";
+import { Control, useFieldArray, useWatch, UseFormSetValue, Controller } from "react-hook-form";
 import { Button } from "primereact/button";
+import { Checkbox } from "primereact/checkbox";
 import { InputTextField } from "../../form/InputTextField";
 import { TextAreaField } from "../../form/TextAreaField";
 import { StepProps, BlueprintData } from "../../../models/blueprint";
@@ -29,6 +30,7 @@ export function DefineOutcomesStep({ formState, onUpdateFormState, onNext, onPre
     append({
       nodeName: "",
       nodeDescription: "",
+      isScored: true, // Default to true
       customerInsights: [],
       customerObjection: [],
       booleanScoreCard: [],
@@ -69,6 +71,7 @@ export function DefineOutcomesStep({ formState, onUpdateFormState, onNext, onPre
     const newNestedNode = {
       nodeName: "",
       nodeDescription: "",
+      isScored: true, // Default to true
       customerInsights: [],
       customerObjection: [],
       booleanScoreCard: [],
@@ -203,6 +206,24 @@ export function DefineOutcomesStep({ formState, onUpdateFormState, onNext, onPre
                 />
               </div>
 
+              {/* isScored Checkbox */}
+              <div className="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <Controller
+                  name={`nestedNodes.${index}.isScored`}
+                  control={control}
+                  defaultValue={true}
+                  render={({ field }) => (
+                    <div className="flex items-center gap-3">
+                      <Checkbox inputId={`isScored-${index}`} checked={field.value !== false} onChange={(e) => field.onChange(e.checked)} />
+                      <label htmlFor={`isScored-${index}`} className="cursor-pointer">
+                        <span className="font-medium text-gray-900">Include in Scoring</span>
+                        <p className="text-sm text-gray-600 mt-1">Uncheck if this outcome should be excluded from scoring (e.g., "No Shows")</p>
+                      </label>
+                    </div>
+                  )}
+                />
+              </div>
+
               {/* Nested Outcomes Section */}
               {isExpanded && (
                 <div className="mt-6 border-t border-gray-200 pt-6">
@@ -280,6 +301,28 @@ export function DefineOutcomesStep({ formState, onUpdateFormState, onNext, onPre
                                     placeholder="Describe this specific scenario"
                                     rows={3}
                                     toolTip="Provide context about this nested scenario"
+                                  />
+                                </div>
+
+                                {/* isScored Checkbox for nested outcomes */}
+                                <div className="p-3 bg-white rounded-lg border border-green-200">
+                                  <Controller
+                                    name={`nestedNodes.${index}.nestedNodes.${nestedIndex}.isScored`}
+                                    control={control}
+                                    defaultValue={true}
+                                    render={({ field }) => (
+                                      <div className="flex items-center gap-3">
+                                        <Checkbox
+                                          inputId={`isScored-${index}-${nestedIndex}`}
+                                          checked={field.value !== false}
+                                          onChange={(e) => field.onChange(e.checked)}
+                                        />
+                                        <label htmlFor={`isScored-${index}-${nestedIndex}`} className="cursor-pointer">
+                                          <span className="font-medium text-gray-900">Include in Scoring</span>
+                                          <p className="text-sm text-gray-600 mt-1">Uncheck if this nested outcome should be excluded from scoring</p>
+                                        </label>
+                                      </div>
+                                    )}
                                   />
                                 </div>
                               </div>

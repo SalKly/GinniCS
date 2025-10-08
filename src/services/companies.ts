@@ -191,10 +191,52 @@ export async function getCompaniesWithForms(): Promise<CompanyWithForm[]> {
   })) as CompanyWithForm[];
 }
 
+// Utility function to remove duplicates from arrays based on name and description
+function removeDuplicates<T extends { name: string; description: string }>(items: T[]): T[] {
+  const seen = new Map<string, T>();
+  items.forEach((item) => {
+    const key = `${item.name}|||${item.description}`;
+    if (!seen.has(key)) {
+      seen.set(key, item);
+    }
+  });
+  return Array.from(seen.values());
+}
+
+// Utility function to remove duplicates from blueprint data
+function deduplicateBlueprintData(formData: BlueprintData): BlueprintData {
+  return {
+    ...formData,
+    booleanScoreCard: removeDuplicates(formData.booleanScoreCard || []),
+    variableScoreCard: removeDuplicates(formData.variableScoreCard || []),
+    customerInsights: removeDuplicates(formData.customerInsights || []),
+    customerObjection: removeDuplicates(formData.customerObjection || []),
+    scorecardSections: formData.scorecardSections || [], // Preserve scorecard sections (no deduplication needed as they have unique IDs)
+    nestedNodes: (formData.nestedNodes || []).map((node) => ({
+      ...node,
+      booleanScoreCard: removeDuplicates(node.booleanScoreCard || []),
+      variableScoreCard: removeDuplicates(node.variableScoreCard || []),
+      customerInsights: removeDuplicates(node.customerInsights || []),
+      customerObjection: removeDuplicates(node.customerObjection || []),
+      nestedNodes: (node.nestedNodes || []).map((nested) => ({
+        ...nested,
+        booleanScoreCard: removeDuplicates(nested.booleanScoreCard || []),
+        variableScoreCard: removeDuplicates(nested.variableScoreCard || []),
+        customerInsights: removeDuplicates(nested.customerInsights || []),
+        customerObjection: removeDuplicates(nested.customerObjection || []),
+      })),
+    })),
+  };
+}
+
 // Utility function to sanitize form data before saving (remove file objects)
 function sanitizeFormData(formData: BlueprintData): BlueprintData {
   const safeBusinessInfo = formData.businessInfo ? { ...formData.businessInfo, qaManualFile: null } : undefined;
-  return { ...formData, businessInfo: safeBusinessInfo };
+  return {
+    ...formData,
+    businessInfo: safeBusinessInfo,
+    scorecardSections: formData.scorecardSections || [], // Explicitly preserve scorecard sections
+  };
 }
 
 // Create or update company and form together
@@ -203,6 +245,7 @@ export async function createOrUpdateCompanyForm(
   formData: BlueprintData,
   website?: string
 ): Promise<{ company: Company; form: CompanyForm }> {
+  // Sanitize before saving (only remove file objects, no deduplication)
   const sanitizedFormData = sanitizeFormData(formData);
 
   // Check if company exists
@@ -258,17 +301,21 @@ export async function saveFormProgress(
             ...partialFormData.businessInfo,
           }
         : existingForm.form_data.businessInfo,
+      // Ensure scorecard sections are properly merged (prefer new data if provided)
+      scorecardSections:
+        partialFormData.scorecardSections !== undefined ? partialFormData.scorecardSections : existingForm.form_data.scorecardSections || [],
     };
   } else {
     // Create new form data with defaults
     mergedFormData = {
-      nodeName: partialFormData.nodeName || "General Outcome",
+      nodeName: partialFormData.nodeName || "All outcomes",
       nodeDescription: partialFormData.nodeDescription || "General criteria for all calls",
       customerInsights: partialFormData.customerInsights || [],
       customerObjection: partialFormData.customerObjection || [],
       booleanScoreCard: partialFormData.booleanScoreCard || [],
       variableScoreCard: partialFormData.variableScoreCard || [],
       nestedNodes: partialFormData.nestedNodes || [],
+      scorecardSections: partialFormData.scorecardSections || [], // Preserve scorecard sections
       businessInfo: {
         businessName: companyName,
         businessGoals: "",
@@ -280,6 +327,7 @@ export async function saveFormProgress(
     };
   }
 
+  // Sanitize before saving (only remove file objects, no deduplication)
   const sanitizedFormData = sanitizeFormData(mergedFormData);
 
   let form: CompanyForm;

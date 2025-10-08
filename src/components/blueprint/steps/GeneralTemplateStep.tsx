@@ -16,10 +16,9 @@ export function GeneralTemplateStep({ formState, onUpdateFormState, onNext, onPr
         <div className="inline-flex items-center justify-center w-10 h-10 bg-green-600 text-white rounded-lg mb-3">
           <i className="fas fa-star text-sm"></i>
         </div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">General Outcome Configuration</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">All Outcomes Configuration</h2>
         <p className="text-gray-600">
-          Configure the evaluation criteria for the General Outcome that applies to all calls. This will serve as the baseline for all call
-          evaluations.
+          Configure the evaluation criteria that will apply for all outcomes. This will serve as the baseline for all call evaluations.
         </p>
       </div>
 
@@ -55,10 +54,10 @@ export function GeneralTemplateStep({ formState, onUpdateFormState, onNext, onPr
             <i className="fas fa-info-circle"></i>
           </div>
           <div>
-            <h4 className="font-semibold text-info-900 mb-2">General Outcome Usage</h4>
+            <h4 className="font-semibold text-info-900 mb-2">All Outcomes Usage</h4>
             <p className="text-info-800">
-              This General Outcome configuration will be applied to every call evaluation. After this, you'll configure specific outcomes that build
-              upon this foundation.
+              This configuration will apply for all outcomes and will be used in every call evaluation. After this, you'll configure specific outcomes
+              that build upon this foundation.
             </p>
           </div>
         </div>

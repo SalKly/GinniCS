@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import { Control, Controller, useFieldArray, useWatch } from "react-hook-form";
+import { Control, useFieldArray, useWatch } from "react-hook-form";
 import { Button } from "primereact/button";
 import { Card } from "primereact/card";
 import { InputTextField } from "../../form/InputTextField";
 import { TextAreaField } from "../../form/TextAreaField";
-import { OutcomeSelector } from "../../form/OutcomeSelector";
 import { StepProps, BlueprintData } from "../../../models/blueprint";
 
 interface ObjectionsStepProps extends StepProps {
@@ -14,7 +13,6 @@ interface ObjectionsStepProps extends StepProps {
 interface ObjectionWithOutcomes {
   name: string;
   description: string;
-  outcomes: string[];
 }
 
 export function ObjectionsStep({ formState, onUpdateFormState, onNext, onPrevious, onComplete, control }: ObjectionsStepProps) {
@@ -30,16 +28,11 @@ export function ObjectionsStep({ formState, onUpdateFormState, onNext, onPreviou
     name: "objections",
   }) as ObjectionWithOutcomes[] | undefined;
 
-  const outcomes = useWatch({
-    control,
-    name: "nestedNodes",
-  });
-
   const addObjection = () => {
     append({
       name: "",
       description: "",
-      outcomes: ["ALL_OUTCOMES"],
+      outcomes: ["ALL_OUTCOMES"], // Always apply to all outcomes
     });
     // Expand the new card
     const newIndex = fields.length;
@@ -82,7 +75,7 @@ export function ObjectionsStep({ formState, onUpdateFormState, onNext, onPreviou
             <h4 className="font-semibold text-purple-900 mb-2">About Customer Objections</h4>
             <p className="text-purple-800">
               Customer objections are concerns, hesitations, or pushback that prospects might raise during sales calls. Defining these helps your team
-              prepare responses and improve their handling of common challenges. You can assign each objection to all outcomes or specific ones.
+              prepare responses and improve their handling of common challenges.
             </p>
           </div>
         </div>
@@ -91,7 +84,10 @@ export function ObjectionsStep({ formState, onUpdateFormState, onNext, onPreviou
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-gray-900">Customer Objections ({fields.length})</h3>
-          <Button type="button" label="Add Objection" icon="fas fa-plus" className="p-button-outlined" onClick={addObjection} />
+          <Button type="button" className="p-button-outlined" onClick={addObjection}>
+            <i className="fas fa-plus mr-2"></i>
+            Add Objection
+          </Button>
         </div>
 
         {fields.length === 0 && (
@@ -111,33 +107,24 @@ export function ObjectionsStep({ formState, onUpdateFormState, onNext, onPreviou
                 {/* Card Header */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <Button
-                      type="button"
-                      icon={isExpanded ? "fas fa-chevron-down" : "fas fa-chevron-right"}
-                      className="p-button-text p-button-sm"
-                      onClick={() => toggleExpanded(index)}
-                    />
+                    <Button type="button" className="p-button-text p-button-sm" onClick={() => toggleExpanded(index)}>
+                      <i className={isExpanded ? "fas fa-chevron-down" : "fas fa-chevron-right"}></i>
+                    </Button>
                     <div className="w-8 h-8 bg-orange-500 text-white rounded-lg flex items-center justify-center text-sm font-semibold">
                       {index + 1}
                     </div>
                     <div>
                       <h4 className="font-semibold text-gray-900">{objection?.name || `Objection ${index + 1}`}</h4>
-                      <div className="flex items-center gap-2 text-xs text-gray-600 mt-1">
-                        {objection?.outcomes?.includes("ALL_OUTCOMES") ? (
-                          <span className="px-2 py-0.5 bg-purple-100 text-purple-800 rounded-full">All Outcomes</span>
-                        ) : (
-                          <span className="px-2 py-0.5 bg-gray-100 text-gray-800 rounded-full">{objection?.outcomes?.length || 0} outcome(s)</span>
-                        )}
-                      </div>
                     </div>
                   </div>
                   <Button
                     type="button"
-                    icon="fas fa-trash"
                     className="p-button-danger p-button-outlined p-button-sm"
                     onClick={() => removeObjection(index)}
                     tooltip="Remove objection"
-                  />
+                  >
+                    <i className="fas fa-trash"></i>
+                  </Button>
                 </div>
 
                 {/* Card Content */}
@@ -166,30 +153,6 @@ export function ObjectionsStep({ formState, onUpdateFormState, onNext, onPreviou
                         rows={5}
                         isRequired
                         toolTip="Explain the objection and provide guidance on addressing it"
-                      />
-                    </div>
-
-                    {/* Configuration Section */}
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <h5 className="text-sm font-semibold text-gray-900 flex items-center gap-2 mb-4">
-                        <i className="fas fa-cog text-orange-600"></i>
-                        Apply to Outcomes
-                      </h5>
-                      {/* Outcome Selector */}
-                      <Controller
-                        name={`objections.${index}.outcomes`}
-                        control={control}
-                        defaultValue={["ALL_OUTCOMES"]}
-                        render={({ field }) => (
-                          <OutcomeSelector
-                            outcomes={outcomes || []}
-                            selectedOutcomes={field.value || ["ALL_OUTCOMES"]}
-                            onChange={field.onChange}
-                            label="Select Call Outcomes"
-                            placeholder="Select outcomes or 'All Outcomes'"
-                            tooltip="Choose which outcomes this objection applies to"
-                          />
-                        )}
                       />
                     </div>
                   </div>

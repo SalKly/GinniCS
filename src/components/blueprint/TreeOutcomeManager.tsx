@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Control, useFieldArray, useWatch } from "react-hook-form";
+import { Control, useFieldArray, useWatch, Controller } from "react-hook-form";
 import { Button } from "primereact/button";
+import { Checkbox } from "primereact/checkbox";
 import { InputTextField } from "../form/InputTextField";
 import { TextAreaField } from "../form/TextAreaField";
 import { ItemListField } from "../form/ItemListField";
@@ -18,6 +19,7 @@ interface OutcomeNode {
   id: string;
   nodeName: string;
   nodeDescription: string;
+  isScored?: boolean;
   customerInsights: any[];
   customerObjection: any[];
   booleanScoreCard: any[];
@@ -44,6 +46,7 @@ export function TreeOutcomeManager({ control, fieldName, parentOutcomeName, leve
     append({
       nodeName: "",
       nodeDescription: "",
+      isScored: true, // Default to true
       customerInsights: [],
       customerObjection: [],
       booleanScoreCard: [],
@@ -246,6 +249,30 @@ export function TreeOutcomeManager({ control, fieldName, parentOutcomeName, leve
                         rows={3}
                         isRequired
                       />
+
+                      {/* isScored Checkbox */}
+                      <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <Controller
+                          name={`${fieldName}.${index}.isScored`}
+                          control={control}
+                          defaultValue={true}
+                          render={({ field }) => (
+                            <div className="flex items-center gap-3">
+                              <Checkbox
+                                inputId={`isScored-${fieldName}-${index}`}
+                                checked={field.value !== false}
+                                onChange={(e) => field.onChange(e.checked)}
+                              />
+                              <label htmlFor={`isScored-${fieldName}-${index}`} className="cursor-pointer">
+                                <span className="font-medium text-gray-900">Include in Scoring</span>
+                                <p className="text-sm text-gray-600 mt-1">
+                                  Uncheck if this outcome should be excluded from scoring (e.g., "No Shows")
+                                </p>
+                              </label>
+                            </div>
+                          )}
+                        />
+                      </div>
                     </div>
 
                     {/* Details Toggle */}

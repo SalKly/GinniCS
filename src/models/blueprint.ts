@@ -4,6 +4,13 @@ export type FailureImpact = "IMMEDIATE" | "WITH_1" | "WITH_2" | "WITH_3" | "WITH
 
 export type FailCriteria = "Yes" | "No";
 
+// Section interface for organizing scorecards
+export interface ScorecardSection {
+  id: string;
+  name: string;
+  description?: string;
+}
+
 // Item-based structure for insights and objections
 export interface InsightItem {
   name: string;
@@ -15,32 +22,32 @@ export interface ObjectionItem {
   description: string;
 }
 
-// Updated YesNoScorecardItem with conditional failWeight
+// YesNoScorecardItem
 export interface YesNoScorecardItem {
   name: string;
   description: string;
-  isItFailCriteria: FailCriteria;
-  failWeight?: string; // Only shown if isItFailCriteria is "Yes"
+  callPhases?: string[];
+  sectionId?: string; // Reference to the section this scorecard belongs to
 }
 
-// Updated VariableScorecardItem with conditional failWeight and failScore
+// VariableScorecardItem
 export interface VariableScorecardItem {
   name: string;
   description: string;
-  isItFailCriteria: FailCriteria;
-  failWeight?: string; // Only shown if isItFailCriteria is "Yes"
+  callPhases?: string[];
   score1Desc: string;
   score2Desc: string;
   score3Desc: string;
   score4Desc: string;
   score5Desc: string;
-  failScore?: number; // Only shown if isItFailCriteria is "Yes"
+  sectionId?: string; // Reference to the section this scorecard belongs to
 }
 
 // Node structure for the new data format
 export interface Node {
   nodeName: string;
   nodeDescription: string;
+  isScored?: boolean; // Indicates if this outcome should be scored (default: true)
   customerInsights: InsightItem[];
   customerObjection: ObjectionItem[];
   booleanScoreCard: YesNoScorecardItem[];
@@ -49,7 +56,7 @@ export interface Node {
 
 // Root node structure (always present, cannot be removed)
 export interface RootNode extends Node {
-  // Root node is always "General Outcome"
+  // Root node is always "All outcomes" - applies to all outcomes
 }
 
 // Nested node structure with recursive children
@@ -71,6 +78,7 @@ export interface BusinessInfo {
 export interface BlueprintData extends RootNode {
   nestedNodes: NestedNode[];
   businessInfo?: BusinessInfo;
+  scorecardSections?: ScorecardSection[]; // Sections for organizing scorecards
 }
 
 // Legacy interfaces for backward compatibility during transition
