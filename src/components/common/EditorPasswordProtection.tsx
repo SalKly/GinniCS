@@ -39,7 +39,7 @@ export function EditorPasswordProtection({ children }: EditorPasswordProtectionP
       setError("Incorrect password. Please try again.");
       setPasswordInput("");
     }
-    
+
     setIsSubmitting(false);
   };
 
